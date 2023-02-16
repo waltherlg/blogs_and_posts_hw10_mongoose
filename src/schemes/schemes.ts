@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import {ObjectId} from "mongodb";
+import {commentType} from "../models/types";
 
 
 export const userSchema = new mongoose.Schema({
@@ -32,5 +33,21 @@ export const blogShema = new mongoose.Schema({
 })
 
 export const postShema = new mongoose.Schema({
+    _id: ObjectId,
+    title: String,
+    shortDescription: String,
+    content: String,
+    blogId: String,
+    blogName: String,
+    createdAt: String
+})
 
+export const commentShema = new mongoose.Schema({
+    _id: ObjectId,
+    parentType: String,
+    parentId: String,
+    content: String,
+    userId:	String,
+    userLogin:	String,
+    createdAt:	String,
 })
