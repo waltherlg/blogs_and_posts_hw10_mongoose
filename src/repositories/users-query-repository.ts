@@ -1,6 +1,7 @@
 import {userType} from "../models/types";
 import {usersCollection, usersRepository} from "./users-repository";
 import {paginationUserOutputModel} from "../models/models";
+import {UserModel} from "../schemes/schemes";
 
 function sort(sortDirection: string){
     return (sortDirection === 'desc') ? -1 : 1;

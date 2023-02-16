@@ -4,13 +4,14 @@ import {userType} from "../models/types";
 import {userTypeOutput} from "../models/types";
 import {usersService} from "../domain/users-service";
 import {passwordRecoveryModel} from "../models/users-models";
+import {UserModel} from "../schemes/schemes";
 
-export const usersCollection = client.db("blogsAndPosts").collection<userType>("users")
+//export const UserModel = client.db("blogsAndPosts").collection<userType>("users")
 
 export const usersRepository = {
 
     async createUser(newUser: userType): Promise<userTypeOutput> {
-        const result = await usersCollection.insertOne(newUser)
+        const result = await UserModel.insertOne(newUser)
         let createdUser = {
             id: newUser._id.toString(),
             login: newUser.login,
@@ -23,14 +24,14 @@ export const usersRepository = {
     async deleteUser(id: string): Promise<boolean>{
         if (ObjectId.isValid(id)){
             let _id = new ObjectId(id)
-            const result = await usersCollection.deleteOne({_id: _id})
+            const result = await UserModel.deleteOne({_id: _id})
             return result.deletedCount === 1
         }
         else return false
     },
 
     async deleteAllUsers(): Promise<boolean>{
-        const result = await usersCollection.deleteMany({})
+        const result = await UserModel.deleteMany({})
         return result.acknowledged
     },
 
@@ -39,7 +40,7 @@ export const usersRepository = {
             return null
         }
         let _id = new ObjectId(id)
-        const user: userType | null = await usersCollection.findOne({_id: _id})
+        const user: userType | null = await UserModel.findOne({_id: _id})
         if (!user){
             return null
         }
@@ -47,14 +48,14 @@ export const usersRepository = {
     },
 
     async getUserByConfirmationCode(code: string): Promise<userType | null> {
-        const user: userType | null = await usersCollection.findOne({confirmationCode: code})
+        const user: userType | null = await UserModel.findOne({confirmationCode: code})
         if (!user){
             return null
         }
         return user
     },
     async getUserByPasswordRecoveryCode(code: string){
-        const user = await usersCollection.findOne({passwordRecoveryCode: code})
+        const user = await UserModel.findOne({passwordRecoveryCode: code})
         if (!user){
             return null
         }
@@ -62,22 +63,22 @@ export const usersRepository = {
     },
 
     async findUserByLoginOrEmail(loginOrEmail: string): Promise<userType | null>{
-        const user = await usersCollection.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
+        const user = await UserModel.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
         return user
     },
 
     async updateConfirmation(_id: ObjectId) {
-        let result = await usersCollection.updateOne({_id}, {$set: {isConfirmed: true} })
+        let result = await UserModel.updateOne({_id}, {$set: {isConfirmed: true} })
         return result.modifiedCount === 1
     },
 
     async refreshConfirmationCode(refreshConfirmationData: any){
-        let result = await usersCollection.updateOne({email: refreshConfirmationData.email}, {$set: {confirmationCode: refreshConfirmationData.confirmationCode, expirationDate: refreshConfirmationData.expirationDate}})
+        let result = await UserModel.updateOne({email: refreshConfirmationData.email}, {$set: {confirmationCode: refreshConfirmationData.confirmationCode, expirationDate: refreshConfirmationData.expirationDate}})
         return result.modifiedCount === 1
     },
 
     async addPasswordRecoveryData(passwordRecoveryData: passwordRecoveryModel){
-        let result = await usersCollection.updateOne({email: passwordRecoveryData.email},
+        let result = await UserModel.updateOne({email: passwordRecoveryData.email},
             {$set:
                     {passwordRecoveryCode: passwordRecoveryData.passwordRecoveryCode,
                     expirationDateOfRecoveryCode: passwordRecoveryData.expirationDateOfRecoveryCode}})
@@ -85,7 +86,7 @@ export const usersRepository = {
     },
 
     async newPasswordSet(_id: ObjectId, passwordSalt: string, passwordHash: string){
-        let result = await usersCollection.updateOne(
+        let result = await UserModel.updateOne(
             {_id: _id},
             {$set:
                     {passwordHash: passwordHash,
