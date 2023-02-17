@@ -1,4 +1,3 @@
-import {client} from "./db";
 import {ObjectId} from "mongodb";
 import {userType} from "../models/types";
 import {userTypeOutput} from "../models/types";
@@ -11,7 +10,7 @@ import {UserModel} from "../schemes/schemes";
 export const usersRepository = {
 
     async createUser(newUser: userType): Promise<userTypeOutput> {
-        const result = await UserModel.insertOne(newUser)
+        const result = await UserModel.insertMany(newUser)
         let createdUser = {
             id: newUser._id.toString(),
             login: newUser.login,
@@ -63,7 +62,7 @@ export const usersRepository = {
     },
 
     async findUserByLoginOrEmail(loginOrEmail: string): Promise<userType | null>{
-        const user = await UserModel.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
+        const user: userType | null = await UserModel.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
         return user
     },
 

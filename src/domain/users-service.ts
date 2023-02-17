@@ -18,10 +18,10 @@ export const usersService = {
             "email": email,
             "createdAt": new Date().toISOString(),
             "confirmationCode": "none",
-            "expirationDate": null,
+            "expirationDate": new Date(),
             "isConfirmed": true,
-            'passwordRecoveryCode': "",
-            'expirationDateOfRecoveryCode': null
+            'passwordRecoveryCode': "none",
+            'expirationDateOfRecoveryCode': new Date()
         }
         const createdUser = await usersRepository.createUser(newUser)
         return createdUser

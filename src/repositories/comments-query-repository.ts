@@ -1,7 +1,8 @@
-import {commentsCollection} from "./comments-repository";
+
 import {sort} from "../application/functions";
 import {skipped} from "../application/functions";
 import {commentType} from "../models/types";
+import {CommentModel} from "../schemes/schemes";
 
 export const commentsQueryRepo = {
 
@@ -12,13 +13,13 @@ export const commentsQueryRepo = {
         pageNumber: string,
         pageSize: string,) {
 
-        let commentsCount = await commentsCollection.countDocuments({$and:[{parentType: "post"},{parentId: postId}]})
+        let commentsCount = await CommentModel.countDocuments({$and:[{parentType: "post"},{parentId: postId}]})
 
-        let comments = await commentsCollection.find({$and:[{parentType: "post"},{parentId: postId}]})
+        let comments = await CommentModel.find({$and:[{parentType: "post"},{parentId: postId}]})
             .sort({[sortBy]: sort(sortDirection)})
             .skip(skipped(pageNumber, pageSize))
             .limit(+pageSize)
-            .toArray()
+            .lean()
 
         let outComments = comments.map((comments: commentType) => {
             return {

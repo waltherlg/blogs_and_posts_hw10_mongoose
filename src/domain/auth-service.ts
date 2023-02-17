@@ -31,7 +31,7 @@ export const authService = {
             }),
             "isConfirmed": false,
             'passwordRecoveryCode': "",
-            'expirationDateOfRecoveryCode': ""
+            'expirationDateOfRecoveryCode': new Date()
         }
         const createdUser = await usersRepository.createUser(newUser)
         try {

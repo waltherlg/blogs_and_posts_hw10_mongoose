@@ -1,10 +1,9 @@
-import {client} from "./db";
+
 import {ObjectId} from "mongodb";
 import {blogType} from "../models/types";
 import {blogTypeOutput} from "../models/types";
+import {BlogModel} from "../schemes/schemes";
 
-
-export const blogCollection = client.db("blogsAndPosts").collection<blogType>("blog")
 
 export const blogsRepository = {
 
@@ -13,7 +12,7 @@ export const blogsRepository = {
             return null
         }
         let _id = new ObjectId(id)
-        const blog: blogType | null = await blogCollection.findOne({_id: _id})
+        const blog: blogType | null = await BlogModel.findOne({_id: _id})
         if (!blog) {
             return null
         }
@@ -28,7 +27,7 @@ export const blogsRepository = {
     },
 
     async getAllBlogs(): Promise<blogTypeOutput[]> {
-        let outBlogs = await blogCollection.find({}).toArray()
+        let outBlogs = await BlogModel.find({}).lean()
         return outBlogs.map((blogs: blogType) => ({
             id: blogs._id.toString(),
             name: blogs.name,
@@ -40,7 +39,7 @@ export const blogsRepository = {
     },
 
     async createBlog(newBlog: blogType): Promise<blogTypeOutput> {
-        const result = await blogCollection.insertOne(newBlog)
+        const result = await BlogModel.insertMany(newBlog)
         let createdBlog = {
             id: newBlog._id.toString(),
             name: newBlog.name,
@@ -55,7 +54,7 @@ export const blogsRepository = {
     async updateBlog(id: string, name: string, description: string, websiteUrl: string): Promise<boolean>{
         if (ObjectId.isValid(id)){
             let _id = new ObjectId(id)
-            const result = await blogCollection
+            const result = await BlogModel
                 .updateOne({_id: _id},{$set: {name: name, description: description, websiteUrl: websiteUrl}})
             return result.matchedCount === 1
         }
@@ -66,7 +65,7 @@ export const blogsRepository = {
     async deleteBlog(id: string): Promise<boolean>{
         if (ObjectId.isValid(id)){
             let _id = new ObjectId(id)
-            const result = await blogCollection.deleteOne({_id: _id})
+            const result = await BlogModel.deleteOne({_id: _id})
             return result.deletedCount === 1
         }
         else return false
@@ -74,7 +73,7 @@ export const blogsRepository = {
     },
 
     async deleteAllBlogs(): Promise<boolean> {
-        const result = await blogCollection.deleteMany({})
+        const result = await BlogModel.deleteMany({})
         return result.acknowledged
     },
 }

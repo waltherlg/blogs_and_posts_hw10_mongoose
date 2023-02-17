@@ -1,11 +1,11 @@
-import {client} from "./db";
 import {ObjectId} from "mongodb";
 
 import {postType} from "../models/types";
 import {postTypeOutput} from "../models/types";
+import {PostModel} from "../schemes/schemes";
 
 
-export const postCollection = client.db("blogsAndPosts").collection<postType>("post")
+//export const postCollection = client.db("blogsAndPosts").collection<postType>("post")
 export const postsRepository = {
 
     async getPostByID(id: string): Promise<postTypeOutput | null> {
@@ -13,7 +13,7 @@ export const postsRepository = {
             return null
         }
         let _id = new ObjectId(id)
-        const post: any | null = await postCollection.findOne({_id: _id})
+        const post: any | null = await PostModel.findOne({_id: _id})
         if (!post) {
             return null
         }
@@ -29,7 +29,7 @@ export const postsRepository = {
     },
 
     async getPostByBlogsID(blogId: string): Promise<postTypeOutput | null> {
-        const post: any | null = await postCollection.findOne({blogId: blogId})
+        const post: any | null = await PostModel.findOne({blogId: blogId})
         if (!post) {
             return null
         }
@@ -45,7 +45,7 @@ export const postsRepository = {
     },
 
     async getAllPosts(): Promise<postTypeOutput[]> {
-        let outPosts = await postCollection.find({}).toArray()
+        let outPosts = await PostModel.find({}).lean()
         return outPosts.map((posts: any) => ({
             id: posts._id.toString(),
             title: posts.title,
@@ -58,7 +58,7 @@ export const postsRepository = {
     },
 
     async createPost(newPost: postType): Promise<postTypeOutput> {
-        const result = await postCollection.insertOne(newPost)
+        const result = await PostModel.insertMany(newPost)
         let createdPost = {
             id: newPost._id.toString(),
             title: newPost.title,
@@ -79,7 +79,7 @@ export const postsRepository = {
         blogId: string): Promise<boolean> {
         if (ObjectId.isValid(id)){
             let _id = new ObjectId(id)
-            const result = await postCollection
+            const result = await PostModel
                 .updateOne({_id: _id},{$set: {
                         title: title,
                         shortDescription: shortDescription,
@@ -94,7 +94,7 @@ export const postsRepository = {
     async deletePost(id: string): Promise<boolean> {
         if (ObjectId.isValid(id)){
             let _id = new ObjectId(id)
-            const  result = await postCollection.deleteOne({_id: _id})
+            const  result = await PostModel.deleteOne({_id: _id})
             return result.deletedCount === 1
         }
         else return false
@@ -102,7 +102,7 @@ export const postsRepository = {
     },
 
     async deleteAllPosts(): Promise<boolean> {
-        const result = await postCollection.deleteMany({})
+        const result = await PostModel.deleteMany({})
         return result.acknowledged
     },
 }

@@ -47,10 +47,10 @@ export type userType = {
     email: string
     createdAt: string
     confirmationCode: string
-    expirationDate: Date | null,
+    expirationDate: Date,
     isConfirmed: boolean,
     passwordRecoveryCode: string,
-    expirationDateOfRecoveryCode: Date | null
+    expirationDateOfRecoveryCode: Date
 }
 export type userTypeOutput = {
     id: string | ObjectId

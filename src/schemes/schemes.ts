@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import {ObjectId} from "mongodb";
-import {commentType, userDeviceDBType} from "../models/types";
+import {blogType, commentType, postType, userDeviceDBType, userType} from "../models/types";
 
 
-export const userSchema = new mongoose.Schema({
+export const userSchema = new mongoose.Schema<userType>({
     _id: ObjectId,
     login: String,
     passwordHash: String,
@@ -11,21 +11,14 @@ export const userSchema = new mongoose.Schema({
     email: String,
     createdAt: String,
     confirmationCode: String,
-    expirationDate: {
-        type: Date,
-        sparse: true
-    },
+    expirationDate: Date,
     isConfirmed: Boolean,
     passwordRecoveryCode: String,
-    expirationDateOfRecoveryCode: {
-        type: Date,
-        sparse: true
-    }
+    expirationDateOfRecoveryCode: Date,
 })
-
 export const UserModel = mongoose.model('users', userSchema)
 
-export const blogShema = new mongoose.Schema({
+export const blogSchema = new mongoose.Schema<blogType>({
     _id: ObjectId,
     name: String,
     description: String,
@@ -33,8 +26,9 @@ export const blogShema = new mongoose.Schema({
     createdAt: String,
     isMembership: Boolean
 })
+export const BlogModel = mongoose.model('blogs', blogSchema)
 
-export const postShema = new mongoose.Schema({
+export const postSchema = new mongoose.Schema<postType>({
     _id: ObjectId,
     title: String,
     shortDescription: String,
@@ -43,8 +37,9 @@ export const postShema = new mongoose.Schema({
     blogName: String,
     createdAt: String
 })
+export const PostModel = mongoose.model('posts', postSchema)
 
-export const commentShema = new mongoose.Schema({
+export const commentSchema = new mongoose.Schema<commentType>({
     _id: ObjectId,
     parentType: String,
     parentId: String,
@@ -53,13 +48,14 @@ export const commentShema = new mongoose.Schema({
     userLogin:	String,
     createdAt:	String,
 })
+export const CommentModel = mongoose.model('comments', commentSchema)
 
-export const userDeviceShema = new mongoose.Schema({
+export const userDeviceSchema = new mongoose.Schema<userDeviceDBType>({
     _id: ObjectId,
     userId: ObjectId,
     ip: String,
     title: String,
     lastActiveDate: String,
     expirationDate: String
-
 })
+export const UserDeviceModel = mongoose.model('userDevices', userDeviceSchema)

@@ -1,9 +1,9 @@
-import {postCollection} from "./posts-repository";
+
 import {postType} from "../models/types";
-import {blogCollection} from "./blogs-repository";
 import {paginationBlogOutputModel, paginationPostOutputModel} from "../models/models";
 import {sort} from "../application/functions";
 import {skipped} from "../application/functions";
+import {PostModel} from "../schemes/schemes";
 
 export const postsQueryRepo = {
 
@@ -13,13 +13,13 @@ export const postsQueryRepo = {
         pageNumber: string,
         pageSize: string,) {
 
-        let postsCount = await postCollection.countDocuments({})
+        let postsCount = await PostModel.countDocuments({})
 
-        let posts = await postCollection.find({})
+        let posts = await PostModel.find({})
             .sort({[sortBy]: sort(sortDirection)})
             .skip(skipped(pageNumber, pageSize))
             .limit(+pageSize)
-            .toArray()
+            .lean()
 
         let outPosts = posts.map((posts: postType) => {
             return {
@@ -53,11 +53,11 @@ export const postsQueryRepo = {
         pageNumber: string,
         pageSize: string,) {
 
-        let posts = await postCollection.find({"blogId": blogId})
+        let posts = await PostModel.find({"blogId": blogId})
             .skip(skipped(pageNumber, pageSize))
             .limit(+pageSize)
             .sort({[sortBy]: sort(sortDirection)})
-            .toArray()
+            .lean()
 
         let outPosts = posts.map((posts: postType) => {
             return {
@@ -71,7 +71,7 @@ export const postsQueryRepo = {
             }
         })
 
-        let postsCount = await postCollection.countDocuments({"blogId": blogId})
+        let postsCount = await PostModel.countDocuments({"blogId": blogId})
 
         let pageCount = Math.ceil(+postsCount / +pageSize)
 

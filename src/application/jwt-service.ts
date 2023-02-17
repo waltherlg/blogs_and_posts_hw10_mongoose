@@ -2,7 +2,7 @@ import {userType} from "../models/types";
 import {ObjectId} from "mongodb";
 import jwt from 'jsonwebtoken'
 import {settings} from "../settings";
-import {expiredTokenRepository} from "../repositories/tokensRepository";
+
 
 export const jwtService = {
     async createJWT(user: userType) {
@@ -13,12 +13,6 @@ export const jwtService = {
     async createJWTRefresh(user: userType, deviceId: ObjectId)  {
     const newRefreshedToken = jwt.sign({userId: user._id, deviceId}, settings.JWT_SECRET, {expiresIn: '20h'})
     return newRefreshedToken
-    },
-
-    async updateJWTRefresh(userId: ObjectId, refreshToken: string)  {
-        await expiredTokenRepository.addTokenToRepo(userId, refreshToken)
-        const newRefreshedToken = jwt.sign({userId: userId}, settings.JWT_SECRET, {expiresIn: '20s'})
-        return newRefreshedToken
     },
 
     async getUserIdFromRefreshToken(token: string) {
@@ -40,11 +34,6 @@ export const jwtService = {
         catch (error) {
             return null
         }
-    },
-
-    async addTokenToRepo(userId: ObjectId, refreshToken: string){
-        await expiredTokenRepository.addTokenToRepo(userId, refreshToken)
-        return
     },
 
     async getLastActiveDateFromRefreshToken (refreshToken: string): Promise<string>{

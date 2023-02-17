@@ -1,9 +1,8 @@
-import {client} from "./db";
-import {postCollection} from "./posts-repository";
-import {blogCollection, blogsRepository} from "./blogs-repository";
+
+import {blogsRepository} from "./blogs-repository";
 import {blogType, blogTypeOutput} from "../models/types";
 import {paginationBlogOutputModel, requestBlogsQueryModel} from "../models/models";
-
+import {BlogModel} from "../schemes/schemes";
 
 function sort(sortDirection: string){
     return (sortDirection === 'desc') ? -1 : 1;
@@ -23,22 +22,22 @@ export const blogsQueryRepo = {
         pageNumber: string,
         pageSize: string,) {
 
-        let blogsCount = await blogCollection.countDocuments({name: new RegExp(searchNameTerm, "gi")})
+        let blogsCount = await BlogModel.countDocuments({name: new RegExp(searchNameTerm, "gi")})
 
         let blogs
         if (searchNameTerm !== 'null'){
-            blogs = await blogCollection.find({name: new RegExp(searchNameTerm, "gi")})
+            blogs = await BlogModel.find({name: new RegExp(searchNameTerm, "gi")})
                 .skip(skipped(pageNumber, pageSize))
                 .limit(+pageSize)
                 .sort({[sortBy]: sort(sortDirection)})
-                .toArray()
+                .lean()
         }
         else {
-            blogs = await blogCollection.find({})
+            blogs = await BlogModel.find({})
                 .skip(skipped(pageNumber, pageSize))
                 .limit(+pageSize)
                 .sort({[sortBy]: sort(sortDirection)})
-                .toArray()
+                .lean()
         }
 
         let outBlogs = blogs.map((blogs: blogType) => {

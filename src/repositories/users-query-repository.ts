@@ -1,5 +1,5 @@
 import {userType} from "../models/types";
-import {usersCollection, usersRepository} from "./users-repository";
+import {usersRepository} from "./users-repository";
 import {paginationUserOutputModel} from "../models/models";
 import {UserModel} from "../schemes/schemes";
 
@@ -21,15 +21,15 @@ export const usersQueryRepo = {
         searchLoginTerm: string,
         searchEmailTerm: string,) {
 
-        let usersCount = await usersCollection.countDocuments({$or:[{login: new RegExp(searchLoginTerm, "gi")},{email: new RegExp(searchEmailTerm, "gi")}]})
+        let usersCount = await UserModel.countDocuments({$or:[{login: new RegExp(searchLoginTerm, "gi")},{email: new RegExp(searchEmailTerm, "gi")}]})
         //let usersCount = await usersCollection.countDocuments({})
 
-        let users = await usersCollection.find({$or:[{login: new RegExp(searchLoginTerm, "gi")},{email: new RegExp(searchEmailTerm, "gi")}]})
+        let users = await UserModel.find({$or:[{login: new RegExp(searchLoginTerm, "gi")},{email: new RegExp(searchEmailTerm, "gi")}]})
         //let users = await usersCollection.find({})
             .sort({[sortBy]: sort(sortDirection)})
             .skip(skipped(pageNumber, pageSize))
             .limit(+pageSize)
-            .toArray()
+            .lean()
 
         let outUsers = users.map((users: userType) => {
             return {
