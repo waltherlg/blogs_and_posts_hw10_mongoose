@@ -5,16 +5,17 @@ dotenv.config()
 import mongoose from "mongoose";
 
 const mongoUri = process.env.MONGO_URL
-if(!mongoUri){
-    throw new Error('URL not found')
-}
+
 
 //export const client = new MongoClient(mongoUri);
 
 export async function runDb(){
     try {
         //await client.connect()
-        await mongoose.connect(mongoUri! + "/" + "blogsAndPosts")
+        if(!mongoUri){
+            throw new Error('URL not found')
+        }
+        await mongoose.connect(mongoUri, {dbName: "blogsAndPosts"})
         console.log("Connected successfully to mongo server")
     }
     catch {

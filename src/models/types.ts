@@ -31,7 +31,7 @@ export type blogTypeOutput = {
     isMembership: boolean
 }
 export type blogType = {
-    _id: string | ObjectId,
+    _id: ObjectId,
     name: string,
     description: string,
     websiteUrl: string,

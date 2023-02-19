@@ -39,7 +39,7 @@ export const blogsRepository = {
     },
 
     async createBlog(newBlog: blogType): Promise<blogTypeOutput> {
-        const result = await BlogModel.insertMany(newBlog)
+        const result = await BlogModel.create(newBlog)
         let createdBlog = {
             id: newBlog._id.toString(),
             name: newBlog.name,
