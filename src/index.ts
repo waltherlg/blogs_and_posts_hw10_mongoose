@@ -14,7 +14,7 @@ import {securityRouter} from "./routes/security-route";
 const bodyParser = require('body-parser');
 
 
-const app = express()
+export const app = express()
 app.set('trust proxy', true)
 const port = process.env.PORT || 3000
 
