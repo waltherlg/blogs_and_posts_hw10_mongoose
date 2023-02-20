@@ -11,7 +11,7 @@ export const testingRouter = Router({})
 
 testingRouter.delete('/all-data',
     async (req: Request, res: Response) => {
-        console.log(req)
+        //console.log(req)
         const isPostsDeleted = await postsService.deleteAllPosts();
         const isBlogsDeleted = await blogsService.deleteAllBlogs();
         const isUsersDeleted = await usersService.deleteAllUsers();

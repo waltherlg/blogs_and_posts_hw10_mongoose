@@ -128,7 +128,7 @@ blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<URIParamsBlo
 
 
 
-// DELETE blog video by id
+// DELETE blog by id
 blogsRouter.delete('/:id',
     basicAuthMiddleware,
     async (req: RequestWithParams<URIParamsBlogModel>, res) => {
