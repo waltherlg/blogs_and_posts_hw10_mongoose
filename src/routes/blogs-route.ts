@@ -122,8 +122,6 @@ blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<URIParamsBlo
             res.status(500).send(error)
         }
     }
-
-
 })
 
 
@@ -148,7 +146,12 @@ blogsRouter.put('/:id',
     websiteUrlValidation,
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<URIParamsBlogModel, updateBlogModel>, res) => {
-    const updateBlog = await blogsService.updateBlog(req.params.id, req.body.name, req.body.description, req.body.websiteUrl)
+    const updateBlog = await blogsService
+        .updateBlog(
+            req.params.id,
+            req.body.name,
+            req.body.description,
+            req.body.websiteUrl)
         if (updateBlog){
             res.sendStatus(204)
         }

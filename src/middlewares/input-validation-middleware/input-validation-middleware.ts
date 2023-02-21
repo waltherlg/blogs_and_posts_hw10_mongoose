@@ -32,7 +32,7 @@ export const loginValidation = body('login')
     .custom(async value => {
         const isLoginExist = await usersService.isLoginExist(value)
         if (isLoginExist) throw new Error
-    }).withMessage({"message": "login already exist", "field": "login" })
+    }).bail().withMessage({"message": "login already exist", "field": "login" })
 
 export const passwordValidation = body('password')
     .exists({checkFalsy: true, checkNull: true}).bail().withMessage({"message": "write your password", "field": "password" })
@@ -54,7 +54,7 @@ export const emailValidation = body('email')
     .custom(async value => {
         const isEmailExist = await usersService.isEmailExist(value)
         if (isEmailExist) throw new Error
-    }).withMessage({"message": "email already exist", "field": "email" })
+    }).bail().withMessage({"message": "email already exist", "field": "email" })
 
 export const emailValidationForRecovery = body('email')
     .exists({checkFalsy: true, checkNull: true}).bail().withMessage({"message": "write your email", "field": "email" })
@@ -106,13 +106,14 @@ export const nameValidation = body('name')
 export const descriptionValidation = body('description')
     .exists().bail().withMessage({"message": "description not exist", "field": "description" })
     .trim().bail().withMessage({"message": "description is not string", "field": "description" })
-    .isLength({max: 500}).withMessage({"message": "wrong length description", "field": "description" })
+    .isLength({max: 500}).bail().withMessage({"message": "wrong length description", "field": "description" })
 
 export const websiteUrlValidation = body('websiteUrl')
     .exists().bail().withMessage({"message": "websiteUrl not exist", "field": "websiteUrl" })
     .trim().bail().withMessage({"message": "websiteUrl is not string", "field": "websiteUrl" })
     .isLength({min: 1, max: 100}).bail().withMessage({"message": "wrong length websiteUrl", "field": "websiteUrl" })
     .isURL().bail().withMessage({"message": "wrong websiteUrl", "field": "websiteUrl" })
+    .matches(/^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/).withMessage({"message": "websiteUrl is not a valid website", "field": "websiteUrl" });
 
 // validations for post
 export const titleValidation = body('title')

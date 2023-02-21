@@ -46,7 +46,8 @@ export const blogsQueryRepo = {
                 name: blogs.name,
                 description: blogs.description,
                 websiteUrl: blogs.websiteUrl,
-                createdAt: blogs.createdAt
+                createdAt: blogs.createdAt,
+                isMembership: blogs.isMembership
             }
         })
 
