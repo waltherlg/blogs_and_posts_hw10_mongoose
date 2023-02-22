@@ -47,7 +47,11 @@ blogsRouter.get('/', async (req: RequestWithQuery<requestBlogsQueryModel>, res: 
     catch (error){
         res.status(500).send(error)
     }
+})
 
+blogsRouter.get('/withoutpaginaion', async (req: Request, res: Response) => {
+    const allBlogs = await blogsService.getAllBlogsWithoutPagination()
+    res.status(200).send(allBlogs)
 })
 
 // POST add blogs

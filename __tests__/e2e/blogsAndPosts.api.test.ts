@@ -4,12 +4,13 @@ import {describe} from "node:test";
 import {response} from "express";
 import {blogsService} from "../../src/domain/blogs-service";
 
+
+const rightAuth = Buffer.from('admin:qwerty').toString('base64');
+const wrongPasswordAuth = Buffer.from('admin:12345').toString('base64');
+const wrongLoginAuth = Buffer.from('12345:qwerty').toString('base64');
 describe('/blogs', () => {
 
     let createdBlogId: string
-    const rightAuth = Buffer.from('admin:qwerty').toString('base64');
-    const wrongPasswordAuth = Buffer.from('admin:12345').toString('base64');
-    const wrongLoginAuth = Buffer.from('12345:qwerty').toString('base64');
 
     beforeAll(async () => {
         await request(app).delete(('/testing/all-data'))

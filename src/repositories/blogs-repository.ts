@@ -26,7 +26,7 @@ export const blogsRepository = {
         }
     },
 
-    async getAllBlogs(): Promise<blogTypeOutput[]> {
+    async getAllBlogsWithoutPagination(): Promise<blogTypeOutput[]> {
         let outBlogs = await BlogModel.find({}).lean()
         return outBlogs.map((blogs: blogType) => ({
             id: blogs._id.toString(),

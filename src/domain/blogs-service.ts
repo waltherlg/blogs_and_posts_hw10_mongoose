@@ -9,6 +9,11 @@ export const blogsService = {
         return blogsRepository.getBlogByID(id)
     },
 
+    async getAllBlogsWithoutPagination(): Promise<blogTypeOutput[]> {
+        return blogsRepository.getAllBlogsWithoutPagination()
+    },
+
+
     // async getAllBlogs(): Promise<blogTypeOutput[]> {
     //     return blogsRepository.getAllBlogs()
     // },
