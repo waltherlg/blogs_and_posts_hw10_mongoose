@@ -187,6 +187,28 @@ describe('/blogs', () => {
         })
     })
 
+    it ('should return 401 if wrong login blog by id', async () => {
+        const createResponse = await request(app)
+            .put(`/blogs/${createdBlogId}`)
+            .set('Authorization', `Basic ${wrongLoginAuth}`)
+            .send({name: "updatedName6",
+                description: 'updatedDescription6',
+                websiteUrl: 'https://www.updatedsomeweb6.com'
+            })
+            .expect(401)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "Login"
+                    }
+                ]})
+    })
+
     it ('should update blog by id', async () => {
         await request(app)
             .put(`/blogs/${createdBlogId}`)
