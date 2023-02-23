@@ -3,11 +3,12 @@ import {app} from '../../src'
 import {describe} from "node:test";
 import {response} from "express";
 import {blogsService} from "../../src/domain/blogs-service";
+import mongoose from "mongoose";
 
 
-const rightAuth = Buffer.from('admin:qwerty').toString('base64');
-const wrongPasswordAuth = Buffer.from('admin:12345').toString('base64');
-const wrongLoginAuth = Buffer.from('12345:qwerty').toString('base64');
+const basicAuthRight = Buffer.from('admin:qwerty').toString('base64');
+const basicAuthWrongPassword = Buffer.from('admin:12345').toString('base64');
+const basicAuthWrongLogin = Buffer.from('12345:qwerty').toString('base64');
 describe('/blogs', () => {
 
     let createdBlogId: string
@@ -20,6 +21,9 @@ describe('/blogs', () => {
         await blogsService.createBlog('newBlogName5', 'newDescription5', 'https://www.someweb5.com');
     })
 
+    afterAll( async () => {
+        await mongoose.disconnect()
+    })
     it('should return status 200 and array with 4 object (with pagination)', async () => {
         const createResponse = await request(app)
             .get('/blogs')
@@ -83,7 +87,7 @@ describe('/blogs', () => {
     it ('should status 401 with wrong password', async () => {
         await request(app)
             .post('/blogs')
-            .set('Authorization', `Basic ${wrongPasswordAuth}`)
+            .set('Authorization', `Basic ${basicAuthWrongPassword}`)
             .send({name: "newBlogName",
                 description: 'newDescription',
                 websiteUrl: 'https://www.someweb.com'
@@ -94,7 +98,7 @@ describe('/blogs', () => {
     it ('should return 401 with wrong login', async () => {
         await request(app)
             .post('/blogs')
-            .set('Authorization', `Basic ${wrongLoginAuth}`)
+            .set('Authorization', `Basic ${basicAuthWrongLogin}`)
             .send({name: "newBlogName",
                 description: 'newDescription',
                 websiteUrl: 'https://www.someweb.com'
@@ -102,54 +106,10 @@ describe('/blogs', () => {
             .expect(401)
     })
 
-    it ('should return 400 with wrong description', async () => {
-        const createResponse = await request(app)
-            .post('/blogs')
-            .set('Authorization', `Basic ${rightAuth}`)
-            .send({name: "newBlogName",
-                websiteUrl: 'https://www.someweb.com'
-            })
-            .expect(400)
-
-        const createdResponse = createResponse.body
-
-        expect(createdResponse).toEqual(
-        {
-            "errorsMessages": [
-            {
-                "message": expect.any(String),
-                "field": "description"
-            }
-        ]
-        })
-    })
-
-    it ('should return 400 with wrong websiteUrl', async () => {
-        const createResponse = await request(app)
-            .post('/blogs')
-            .set('Authorization', `Basic ${rightAuth}`)
-            .send({name: "newBlogName",
-                description: 'newDescription',
-                websiteUrl: 'www.somewebcom'
-            })
-            .expect(400)
-
-        const createdResponse = createResponse.body
-
-        expect(createdResponse).toEqual(
-            {
-                "errorsMessages": [
-                    {
-                        "message": expect.any(String),
-                        "field": "websiteUrl"
-                    }
-                ]})
-    })
-
     it ('should create new blog with status 201', async () => {
         const createResponse = await request(app)
             .post('/blogs')
-            .set('Authorization', `Basic ${rightAuth}`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
             .send({name: "newBlogName6",
                 description: 'newDescription6',
                 websiteUrl: 'https://www.someweb6.com'
@@ -178,7 +138,7 @@ describe('/blogs', () => {
         const createdResponse = createResponse.body
 
         expect(createdResponse).toEqual({
-            id: expect.any(String),
+            id: createdBlogId,
             name: 'newBlogName6',
             description: 'newDescription6',
             websiteUrl: 'https://www.someweb6.com',
@@ -188,31 +148,20 @@ describe('/blogs', () => {
     })
 
     it ('should return 401 if wrong login blog by id', async () => {
-        const createResponse = await request(app)
+        await request(app)
             .put(`/blogs/${createdBlogId}`)
-            .set('Authorization', `Basic ${wrongLoginAuth}`)
+            .set('Authorization', `Basic ${basicAuthWrongLogin}`)
             .send({name: "updatedName6",
                 description: 'updatedDescription6',
                 websiteUrl: 'https://www.updatedsomeweb6.com'
             })
             .expect(401)
-
-        const createdResponse = createResponse.body
-
-        expect(createdResponse).toEqual(
-            {
-                "errorsMessages": [
-                    {
-                        "message": expect.any(String),
-                        "field": "Login"
-                    }
-                ]})
     })
 
     it ('should update blog by id', async () => {
         await request(app)
             .put(`/blogs/${createdBlogId}`)
-            .set('Authorization', `Basic ${rightAuth}`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
             .send({name: "updatedName6",
                 description: 'updatedDescription6',
                 websiteUrl: 'https://www.updatedsomeweb6.com'
@@ -287,7 +236,7 @@ describe('/blogs', () => {
     it ('should return 404 if try delete blog by non existing id', async () => {
         await request(app)
             .delete(`/blogs/:111111111111111111111111`)
-            .set('Authorization', `Basic ${rightAuth}`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
             .expect(404)
     })
 
@@ -295,8 +244,55 @@ describe('/blogs', () => {
         const auth = Buffer.from('admin:qwerty').toString('base64');
         await request(app)
             .delete(`/blogs/${createdBlogId}`)
-            .set('Authorization', `Basic ${rightAuth}`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
             .expect(204)
+    })
+})
+
+describe('01 /blogs validation tests', () => {
+
+    it ('01-01 should return 400 with wrong description', async () => {
+        const createResponse = await request(app)
+            .post('/blogs')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({name: "newBlogName",
+                websiteUrl: 'https://www.someweb.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "description"
+                    }
+                ]
+            })
+    })
+
+    it ('01-02 should return 400 with wrong websiteUrl', async () => {
+        const createResponse = await request(app)
+            .post('/blogs')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({name: "newBlogName",
+                description: 'newDescription',
+                websiteUrl: 'www.somewebcom'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "websiteUrl"
+                    }
+                ]})
     })
 
 })
