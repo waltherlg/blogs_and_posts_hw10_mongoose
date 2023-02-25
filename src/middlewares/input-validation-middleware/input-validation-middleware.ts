@@ -106,7 +106,7 @@ export const nameValidation = body('name')
 export const descriptionValidation = body('description')
     .exists().bail().withMessage({"message": "description not exist", "field": "description" })
     .trim().bail().withMessage({"message": "description is not string", "field": "description" })
-    .isLength({max: 500}).bail().withMessage({"message": "wrong length description", "field": "description" })
+    .isLength({min: 1, max: 500}).bail().withMessage({"message": "wrong length description", "field": "description" })
 
 export const websiteUrlValidation = body('websiteUrl')
     .exists().bail().withMessage({"message": "websiteUrl not exist", "field": "websiteUrl" })

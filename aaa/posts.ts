@@ -1,7 +1,8 @@
 import request from "supertest"
-import {app} from '../../src'
+import {app} from '../../src/settings'
 import {describe} from "node:test";
 import {response} from "express";
+import mongoose from "mongoose";
 
 const basicAuthRight = Buffer.from('admin:qwerty').toString('base64');
 const basicAuthWrongPassword = Buffer.from('admin:12345').toString('base64');
@@ -9,7 +10,11 @@ const basicAuthWrongLogin = Buffer.from('12345:qwerty').toString('base64');
 let testedBlogId: string
 describe('01 /posts validation', () => {
     beforeAll(async () => {
-        await request(app).delete(('/testing/all-data'))
+        //await request(app).delete(('/testing/all-data'))
+    })
+
+    afterAll( async () => {
+        await mongoose.disconnect()
     })
 
     it('01-00 Create new blog for tests 201', async () => {
@@ -37,30 +42,30 @@ describe('01 /posts validation', () => {
 
     })
 
-        it('01-01 should return 400 with wrong title', async () => {
-            const createResponse = await request(app)
-                .post('/posts')
-                .set('Authorization', `Basic ${basicAuthRight}`)
-                .send({
-                    title: "",
-                    shortDescription: 'some short description',
-                    content: 'some new content',
-                    blogId: testedBlogId
-                })
-                .expect(400)
+    it('01-01 should return 400 with wrong title', async () => {
+        const createResponse = await request(app)
+            .post('/posts')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: "",
+                shortDescription: 'some short description',
+                content: 'some new content',
+                blogId: testedBlogId
+            })
+            .expect(400)
 
-            const createdResponse = createResponse.body
+        const createdResponse = createResponse.body
 
-            expect(createdResponse).toEqual(
-                {
-                    "errorsMessages": [
-                        {
-                            "message": expect.any(String),
-                            "field": "title"
-                        }
-                    ]
-                })
-        })
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "title"
+                    }
+                ]
+            })
+    })
 
 
 })
