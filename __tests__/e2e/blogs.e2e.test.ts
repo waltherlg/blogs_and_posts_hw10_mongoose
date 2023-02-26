@@ -9,6 +9,8 @@ import mongoose from "mongoose";
 const basicAuthRight = Buffer.from('admin:qwerty').toString('base64');
 const basicAuthWrongPassword = Buffer.from('admin:12345').toString('base64');
 const basicAuthWrongLogin = Buffer.from('12345:qwerty').toString('base64');
+
+const notExistingId = '111111111111111111111111'
 describe('01 /blogs', () => {
 
     let createdBlogId: string
@@ -298,9 +300,6 @@ describe('01 /blogs', () => {
             }
         )
     })
-})
-
-describe('01 /blogs validation tests', () => {
 
     it ('01-13 /blogs POST = 400 if no description', async () => {
         const createResponse = await request(app)
@@ -370,7 +369,7 @@ describe('01 /blogs validation tests', () => {
             })
     })
 
-    it ('01-14 /blogs POST = 400 if wrong websiteUrl', async () => {
+    it ('01-16 /blogs POST = 400 if websiteUrl has the wrong format', async () => {
         const createResponse = await request(app)
             .post('/blogs')
             .set('Authorization', `Basic ${basicAuthRight}`)
@@ -392,4 +391,596 @@ describe('01 /blogs validation tests', () => {
                 ]})
     })
 
+    it ('01-17 /blogs POST = 400 if no websiteUrl in body', async () => {
+        const createResponse = await request(app)
+            .post('/blogs')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({name: "newBlogName",
+                description: 'newDescription'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "websiteUrl"
+                    }
+                ]})
+    })
+
+    it ('01-18 /blogs POST = 400 if name is empty', async () => {
+        const createResponse = await request(app)
+            .post('/blogs')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({name: "",
+                description: 'newDescription',
+                websiteUrl: 'https://www.somewebcom.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "name"
+                    }
+                ]})
+    })
+
+    it ('01-19 /blogs POST = 400 if name is empty', async () => {
+        const createResponse = await request(app)
+            .post('/blogs')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({name: "",
+                description: 'newDescription',
+                websiteUrl: 'https://www.somewebcom.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "name"
+                    }
+                ]})
+    })
+
+    it ('01-20 /blogs POST = 400 if the name is more than 15 characters', async () => {
+        const createResponse = await request(app)
+            .post('/blogs')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({name: "onemoreoneonemoreoneandonamore",
+                description: 'newDescription',
+                websiteUrl: 'https://www.somewebcom.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "name"
+                    }
+                ]})
+    })
+
+    it ('01-21 /blogs POST = 400 if the name is not a string', async () => {
+        const createResponse = await request(app)
+            .post('/blogs')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({name: 45623485935,
+                description: 'newDescription',
+                websiteUrl: 'https://www.somewebcom.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "name"
+                    }
+                ]})
+    })
+
+    let blogIdForPostsOperations: string
+    let blogNameForPostsOperations: string
+
+    it('02-00 /posts POST = 201 Create new blog for tests', async () => {
+        const createResponse = await request(app)
+            .post('/blogs')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                name: "blogForPost",
+                description: 'this blog was created for testing posts',
+                websiteUrl: 'https://www.blog-for-post.com'
+            })
+            .expect(201)
+
+        const createdResponse = createResponse.body
+        blogIdForPostsOperations = createdResponse.id;
+        blogNameForPostsOperations = createdResponse.name
+
+        expect(createdResponse).toEqual({
+            id: blogIdForPostsOperations,
+            name: 'blogForPost',
+            description: 'this blog was created for testing posts',
+            websiteUrl: 'https://www.blog-for-post.com',
+            createdAt: createdResponse.createdAt,
+            isMembership: true
+        })
+
+    })
+
+    it('02-01 /posts POST = 400 with error massage if no title in body', async () => {
+        const createResponse = await request(app)
+            .post('/posts')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                shortDescription: 'some short description',
+                content: 'some new content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "title"
+                    }
+                ]
+            })
+    })
+
+    it('02-02 /posts POST = 400 with error massage if empty title', async () => {
+        const createResponse = await request(app)
+            .post('/posts')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: "",
+                shortDescription: 'some short description',
+                content: 'some new content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "title"
+                    }
+                ]
+            })
+    })
+
+    it('02-03 /posts POST = 400 with error massage if title not string', async () => {
+        const createResponse = await request(app)
+            .post('/posts')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: 543657445774,
+                shortDescription: 'some short description',
+                content: 'some new content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "title"
+                    }
+                ]
+            })
+    })
+
+    it('02-04 /posts POST = 400 with error massage if no shortDescription in body', async () => {
+        const createResponse = await request(app)
+            .post('/posts')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: 'somePostTitle',
+                content: 'some new content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "shortDescription"
+                    }
+                ]
+            })
+    })
+
+    it('02-05 /posts POST = 400 with error massage if shortDescription is empty', async () => {
+        const createResponse = await request(app)
+            .post('/posts')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: 'somePostTitle',
+                shortDescription: '',
+                content: 'some new content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "shortDescription"
+                    }
+                ]
+            })
+    })
+
+    it('02-06 /posts POST = 400 with error massage if content is not a string', async () => {
+        const createResponse = await request(app)
+            .post('/posts')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: 'somePostTitle',
+                shortDescription: 'some short description',
+                content: 1565468623,
+                blogId: blogIdForPostsOperations
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "content"
+                    }
+                ]
+            })
+    })
+
+    it('02-07 /posts POST = 400 with error massage if blogId not exist', async () => {
+        const createResponse = await request(app)
+            .post('/posts')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: 'somePostTitle',
+                shortDescription: 'some short description',
+                content: 'some new content',
+                blogId: '111111111111111111111111'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "blogId"
+                    }
+                ]
+            })
+    })
+
+    it('02-07-1 /posts GET = 200 and empty array (with pagination)', async () => {
+        const createResponse = await request(app)
+            .get('/posts')
+            .expect(200)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 0,
+                items: [
+                ]
+            }
+        )
+    })
+
+    let postIdForPostOperations: string
+
+    it('02-08 /posts POST = 201 with created post if all is OK', async () => {
+        const createResponse = await request(app)
+            .post('/posts')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: 'somePostTitle',
+                shortDescription: 'some short description',
+                content: 'some new content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(201)
+
+        const createdResponse = createResponse.body
+        postIdForPostOperations = createdResponse.id
+
+        expect(createdResponse).toEqual({
+            id: postIdForPostOperations,
+            title: 'somePostTitle',
+            shortDescription: 'some short description',
+            content: 'some new content',
+            blogId: blogIdForPostsOperations,
+            blogName: blogNameForPostsOperations,
+            createdAt: createdResponse.createdAt
+        })
+    })
+
+    it('02-09 /posts GET = 200 and array with one post (with pagination)', async () => {
+        const createResponse = await request(app)
+            .get('/posts')
+            .expect(200)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 1,
+                items: [
+                    {
+                        id: postIdForPostOperations,
+                        title: 'somePostTitle',
+                        shortDescription: 'some short description',
+                        content: 'some new content',
+                        blogId: blogIdForPostsOperations,
+                        blogName: blogNameForPostsOperations,
+                        createdAt: expect.any(String)
+                    }
+                ]
+            }
+        )
+    })
+
+    it('02-10 /posts/:{postId} GET = 404 if postId is not exist', async  () => {
+        await request(app)
+            .get(`/posts/:111111111111111111111111`)
+            .expect(404)
+    })
+
+    it('02-11 /posts/:{postId} GET = 200 and post', async  () => {
+        const createResponse = await request(app)
+            .get(`/posts/${postIdForPostOperations}`)
+            .expect(200)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+            id: postIdForPostOperations,
+            title: 'somePostTitle',
+            shortDescription: 'some short description',
+            content: 'some new content',
+            blogId: blogIdForPostsOperations,
+            blogName: blogNameForPostsOperations,
+            createdAt: expect.any(String)
+        })
+    })
+
+    it('02-12 /posts/:{postId} PUT = 401 if no auth data', async  () => {
+        await request(app)
+            .put(`/posts/${postIdForPostOperations}`)
+            .send({
+                title: 'updatedTitle',
+                shortDescription: 'some updated short description',
+                content: 'some updated content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(401)
+    })
+
+    it('02-13 /posts/:{postId} PUT = 401 if wrong login', async  () => {
+        await request(app)
+            .put(`/posts/${postIdForPostOperations}`)
+            .set('Authorization', `Basic ${basicAuthWrongLogin}`)
+            .send({
+                title: 'updatedTitle',
+                shortDescription: 'some updated short description',
+                content: 'some updated content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(401)
+    })
+
+    it('02-14 /posts/:{postId} PUT = 400 if title too long', async  () => {
+        const createResponse = await request(app)
+            .put(`/posts/${postIdForPostOperations}`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: 'updatedTitleupdatedTitleupdatedTitleupdatedTitle',
+                shortDescription: 'some updated short description',
+                content: 'some updated content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "title"
+                    }
+                ]
+            })
+    })
+
+    it('02-15 /posts/:{postId} PUT = 400 if shortDescription is empty', async  () => {
+        const createResponse = await request(app)
+            .put(`/posts/${postIdForPostOperations}`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: 'updatedTitle',
+                shortDescription: '',
+                content: 'some updated content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "shortDescription"
+                    }
+                ]
+            })
+    })
+
+    it('02-16 /posts/:{postId} PUT = 400 if no content in body', async  () => {
+        const createResponse = await request(app)
+            .put(`/posts/${postIdForPostOperations}`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: 'updatedTitle',
+                shortDescription: 'some updated short description',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "content"
+                    }
+                ]
+            })
+    })
+
+    it('02-17 /posts/:{postId} PUT = 204 if all is OK', async  () => {
+        await request(app)
+            .put(`/posts/${postIdForPostOperations}`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                title: 'updatedTitle',
+                shortDescription: 'some updated short description',
+                content: 'some updated content',
+                blogId: blogIdForPostsOperations
+            })
+            .expect(204)
+    })
+
+    it('02-18 /posts/:{postId} GET = 200 and post after updating', async  () => {
+        const createResponse = await request(app)
+            .get(`/posts/${postIdForPostOperations}`)
+            .expect(200)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+            id: postIdForPostOperations,
+            title: 'updatedTitle',
+            shortDescription: 'some updated short description',
+            content: 'some updated content',
+            blogId: blogIdForPostsOperations,
+            blogName: blogNameForPostsOperations,
+            createdAt: expect.any(String)
+        })
+    })
+
+    it('02-19 /posts/:{postId} DELETE = 401 if no auth data', async  () => {
+        await request(app)
+            .delete(`/posts/${postIdForPostOperations}`)
+            .expect(401)
+    })
+
+    it('02-20 /posts/:{postId} DELETE = 204 if all OK', async  () => {
+        await request(app)
+            .delete(`/posts/${postIdForPostOperations}`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .expect(204)
+    })
+
+    it('02-21 /posts/:{postId} GET = 404 after deleting post by id', async  () => {
+        await request(app)
+            .get(`/posts/${postIdForPostOperations}`)
+            .expect(404)
+    })
+
+    it('02-22 /posts GET = 200 and empty array (with pagination after deleting post by id)', async () => {
+        const createResponse = await request(app)
+            .get('/posts')
+            .expect(200)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 0,
+                items: [
+                ]
+            }
+        )
+    })
+
+
+
 })
+
+
+
+
+// describe('02 /posts validation', () => {
+//
+//     beforeAll(async () => {
+//         await request(app).delete(('/testing/all-data'))
+//     })
+//
+//
+//
+//
+//
+// })

@@ -21,7 +21,7 @@ export const postsService = {
         content: string,
         blogId: string): Promise<postTypeOutput> {
         let foundBlog = await blogsService.getBlogByID(blogId)
-        const blogName =  foundBlog!.name
+        const blogName = foundBlog!.name
         const newPost: postType = {
             "_id": new ObjectId(),
             "title": title,

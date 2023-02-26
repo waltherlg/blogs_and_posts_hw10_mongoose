@@ -106,7 +106,7 @@ blogsRouter.get('/:id', async (req: RequestWithParams<URIParamsBlogModel>, res: 
 
 //GET all posts by blogs id
 blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<URIParamsBlogModel, requestPostsByBlogsIdQueryModel>, res: Response) => {
-    let foundBlog = await blogsService.getBlogByID(req.params.id.toString())
+    let foundBlog = await blogsService.getBlogByID(req.params.id.toString()) // check is blog exist
     if(!foundBlog){
         res.sendStatus(404)
     }
