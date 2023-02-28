@@ -4,6 +4,7 @@ import {describe} from "node:test";
 import {response} from "express";
 import {blogsService} from "../../src/domain/blogs-service";
 import mongoose from "mongoose";
+import {postsService} from "../../src/domain/posts-service";
 
 
 const basicAuthRight = Buffer.from('admin:qwerty').toString('base64');
@@ -992,12 +993,26 @@ describe('01 /blogs', () => {
     })
 
     it ('02-24 /blogs/:{blogId}/posts POST = 201 create post, using blogs Id', async () => {
+
+        await postsService.createPost('postBFP2',
+            'post2, created for check BFP2',
+            'some content, post2, created for check BFP2',
+            blogIdForPostsOperations2)
+        await postsService.createPost('postBFP3',
+            'post3, created for check BFP2',
+            'some content, post3, created for check BFP2',
+            blogIdForPostsOperations2)
+        await postsService.createPost('postBFP4',
+            'post4, created for check BFP2',
+            'some content, post4, created for check BFP2',
+            blogIdForPostsOperations2)
+
         const createResponse = await request(app)
             .post(`/blogs/${blogIdForPostsOperations}/posts`)
             .set('Authorization', `Basic ${basicAuthRight}`)
             .send({title: 'titleCreated1',
                 shortDescription: 'post created by blogsId1 in params',
-                content: 'some content, created by blogsId in params'
+                content: 'some content, created by blogsId1 in params'
             })
             .expect(201)
 
@@ -1007,12 +1022,370 @@ describe('01 /blogs', () => {
             id: expect.any(String),
             title: 'titleCreated1',
             shortDescription: 'post created by blogsId1 in params',
-            content: 'some content, created by blogsId in params',
+            content: 'some content, created by blogsId1 in params',
             blogId: blogIdForPostsOperations,
             blogName: blogNameForPostsOperations,
             createdAt: expect.any(String)
         })
     })
+
+    it('02-22 /posts GET = 200 and array with 4 posts with pagination (before check getting posts by blogsId)', async () => {
+
+        const createResponse = await request(app)
+            .get('/posts')
+            .expect(200)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 4,
+                items: [
+                    {
+                        id: expect.any(String),
+                        title: 'titleCreated1',
+                        shortDescription: 'post created by blogsId1 in params',
+                        content: 'some content, created by blogsId1 in params',
+                        blogId: blogIdForPostsOperations,
+                        blogName: blogNameForPostsOperations,
+                        createdAt: expect.any(String)
+                    },
+                    {
+                        id: expect.any(String),
+                        title: 'postBFP4',
+                        shortDescription: 'post4, created for check BFP2',
+                        content: 'some content, post4, created for check BFP2',
+                        blogId: blogIdForPostsOperations2,
+                        blogName: 'blogForPost2',
+                        createdAt: expect.any(String)
+                    },
+                    {
+                        id: expect.any(String),
+                        title: 'postBFP3',
+                        shortDescription: 'post3, created for check BFP2',
+                        content: 'some content, post3, created for check BFP2',
+                        blogId: blogIdForPostsOperations2,
+                        blogName: 'blogForPost2',
+                        createdAt: expect.any(String)
+                    },
+                    {
+                        id: expect.any(String),
+                        title: 'postBFP2',
+                        shortDescription: 'post2, created for check BFP2',
+                        content: 'some content, post2, created for check BFP2',
+                        blogId: blogIdForPostsOperations2,
+                        blogName: 'blogForPost2',
+                        createdAt: expect.any(String)
+                    },
+                ]
+        })
+    })
+
+    it ('02-24 /blogs/:{blogId}/posts GET = 404 if this blog id not exist', async () => {
+        const createResponse = await request(app)
+            .get(`/blogs/${111111111}/posts`)
+            .expect(404)
+    })
+
+    it ('02-24 /blogs/:{blogId}/posts GET = 200 and all 3 posts for this blog (with pagination', async () => {
+        const createResponse = await request(app)
+            .get(`/blogs/${blogIdForPostsOperations2}/posts`)
+            .expect(200)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 3,
+                items: [
+                    {
+                        id: expect.any(String),
+                        title: 'postBFP4',
+                        shortDescription: 'post4, created for check BFP2',
+                        content: 'some content, post4, created for check BFP2',
+                        blogId: blogIdForPostsOperations2,
+                        blogName: 'blogForPost2',
+                        createdAt: expect.any(String)
+                    },
+                    {
+                        id: expect.any(String),
+                        title: 'postBFP3',
+                        shortDescription: 'post3, created for check BFP2',
+                        content: 'some content, post3, created for check BFP2',
+                        blogId: blogIdForPostsOperations2,
+                        blogName: 'blogForPost2',
+                        createdAt: expect.any(String)
+                    },
+                    {
+                        id: expect.any(String),
+                        title: 'postBFP2',
+                        shortDescription: 'post2, created for check BFP2',
+                        content: 'some content, post2, created for check BFP2',
+                        blogId: blogIdForPostsOperations2,
+                        blogName: 'blogForPost2',
+                        createdAt: expect.any(String)
+                    },
+                ]
+        })
+    })
+
+    let userIdForTests: string
+
+    it('03-00 /users POST = 201 with return new user if all is OK', async () => {
+        const createResponse = await request(app)
+            .post('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({login: 'ruslan',
+                password: 'qwerty',
+                email: 'ismailovrt.it@gmail.com'
+            })
+            .expect(201)
+
+        const createdResponse = createResponse.body
+        userIdForTests = createdResponse.id
+
+        expect(createdResponse).toEqual({
+            id: userIdForTests,
+            login: 'ruslan',
+            email: 'ismailovrt.it@gmail.com',
+            createdAt: expect.any(String)
+        })
+    })
+
+    it('03-01 /users POST = 401 if no auth data', async () => {
+        const createResponse = await request(app)
+            .post('/users')
+            .send({login: 'ruslan',
+                password: 'qwerty',
+                email: 'ismailovrt.it@gmail.com'
+            })
+            .expect(401)
+    })
+
+    it('03-02 /users POST = 401 if wrong password', async () => {
+        await request(app)
+            .post('/users')
+            .set('Authorization', `Basic ${basicAuthWrongPassword}`)
+            .send({login: 'ruslan',
+                password: 'qwerty',
+                email: 'ismailovrt.it@gmail.com'
+            })
+            .expect(401)
+    })
+
+    it('03-03 /users POST = 400 with error message if no login in body', async () => {
+        const createResponse = await request(app)
+            .post('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({
+                password: 'qwerty',
+                email: 'ismailovrt.it@gmail.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "login"
+                    }
+                ]
+            })
+    })
+
+    it('03-04 /users POST = 400 with error message if no login too many character', async () => {
+        const createResponse = await request(app)
+            .post('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({login: 'ruslanbestrulessupermega',
+                password: 'qwerty',
+                email: 'ismailovrt.it@gmail.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "login"
+                    }
+                ]
+            })
+    })
+
+    it('03-05 /users POST = 400 with error message if login already exist', async () => {
+        const createResponse = await request(app)
+            .post('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({login: 'ruslan',
+                password: 'qwerty',
+                email: 'ismailovrt.it@luft-mail.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "login"
+                    }
+                ]
+            })
+    })
+
+    it('03-06 /users POST = 400 with error message if password is empty', async () => {
+        const createResponse = await request(app)
+            .post('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({login: 'ruslan',
+                password: '',
+                email: 'ismailovrt.it@luft-mail.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "password"
+                    }
+                ]
+            })
+    })
+
+    it('03-07 /users POST = 400 with error message if password les then 6 character', async () => {
+        const createResponse = await request(app)
+            .post('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({login: 'ruslan2',
+                password: 'qwe',
+                email: 'ismailovrt.it@luft-mail.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "password"
+                    }
+                ]
+            })
+    })
+
+    it('03-08 /users POST = 400 with error message if email has wrong format v1', async () => {
+        const createResponse = await request(app)
+            .post('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({login: 'ruslan2',
+                password: 'qwerty',
+                email: 'ismailovrt.it@gmailcom'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "email"
+                    }
+                ]
+            })
+    })
+
+    it('03-09 /users POST = 400 with error message if email has wrong format v2', async () => {
+        const createResponse = await request(app)
+            .post('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({login: 'ruslan2',
+                password: 'qwerty',
+                email: 'ismailovrt.itgmail.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "email"
+                    }
+                ]
+            })
+    })
+
+    it('03-10 /users POST = 400 with error message if email already using', async () => {
+        const createResponse = await request(app)
+            .post('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({login: 'ruslan2',
+                password: 'qwerty',
+                email: 'ismailovrt.it@gmail.com'
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": expect.any(String),
+                        "field": "email"
+                    }
+                ]
+            })
+    })
+
+    it('03-11 /users GET = 200 and array of users with pagination', async () => {
+        const createResponse = await request(app)
+            .get('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .expect(200)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+            pagesCount: 1,
+            page: 1,
+            pageSize: 10,
+            totalCount: 1,
+            items: [
+                {
+                    id: userIdForTests,
+                    login: 'ruslan',
+                    email: 'ismailovrt.it@gmail.com',
+                    createdAt: expect.any(String)
+                },
+            ]
+        })
+    })
+
+
 
 
 })
