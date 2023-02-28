@@ -33,7 +33,6 @@ usersRouter.post('/',
 
 usersRouter.delete('/:id',
     basicAuthMiddleware,
-    inputValidationMiddleware,
     async (req: RequestWithParams<userParamURIModel>, res: Response) => {
     const isUserDeleted = await usersService.deleteUser(req.params.id)
         if (isUserDeleted) {
@@ -46,7 +45,6 @@ usersRouter.delete('/:id',
 
 usersRouter.get('/',
     basicAuthMiddleware,
-    inputValidationMiddleware,
     async (req: RequestWithQuery<requestUsersQueryModel>, res: Response) =>{
     try {
         let sortBy = req.query.sortBy ? req.query.sortBy: 'createdAt'

@@ -109,7 +109,7 @@ describe('01 /blogs', () => {
             .expect(401)
     })
 
-    it ('01-04 /blogs POST  = 201 create new blog', async () => {
+    it ('01-04 /blogs POST  = 201 create new blog if all is OK', async () => {
         const createResponse = await request(app)
             .post('/blogs')
             .set('Authorization', `Basic ${basicAuthRight}`)
@@ -130,7 +130,6 @@ describe('01 /blogs', () => {
             createdAt: createdResponse.createdAt,
             isMembership: true
         })
-
     })
 
     it ('01-05 /blogs GET = 200 return blog by id', async () => {
@@ -710,7 +709,7 @@ describe('01 /blogs', () => {
         const createdResponse = createResponse.body
 
         expect(createdResponse).toEqual({
-                pagesCount: 1,
+                pagesCount: 0,
                 page: 1,
                 pageSize: 10,
                 totalCount: 0,
@@ -949,6 +948,7 @@ describe('01 /blogs', () => {
     })
 
     it('02-22 /posts GET = 200 and empty array (with pagination after deleting post by id)', async () => {
+
         const createResponse = await request(app)
             .get('/posts')
             .expect(200)
@@ -956,7 +956,7 @@ describe('01 /blogs', () => {
         const createdResponse = createResponse.body
 
         expect(createdResponse).toEqual({
-                pagesCount: 1,
+                pagesCount: 0,
                 page: 1,
                 pageSize: 10,
                 totalCount: 0,
@@ -966,6 +966,53 @@ describe('01 /blogs', () => {
         )
     })
 
+    let blogIdForPostsOperations2: string
+
+    it ('02-23 /blogs POST = creating one more blog for test', async () => {
+        const createResponse = await request(app)
+            .post('/blogs')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({name: "blogForPost2",
+                description: 'one more blog for post operation',
+                websiteUrl: 'https://www.one-more-blog-for-post.com'
+            })
+            .expect(201)
+
+        const createdResponse = createResponse.body
+        blogIdForPostsOperations2 = createdResponse.id;
+
+        expect(createdResponse).toEqual({
+            id: blogIdForPostsOperations2,
+            name: 'blogForPost2',
+            description: 'one more blog for post operation',
+            websiteUrl: 'https://www.one-more-blog-for-post.com',
+            createdAt: createdResponse.createdAt,
+            isMembership: true
+        })
+    })
+
+    it ('02-24 /blogs/:{blogId}/posts POST = 201 create post, using blogs Id', async () => {
+        const createResponse = await request(app)
+            .post(`/blogs/${blogIdForPostsOperations}/posts`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .send({title: 'titleCreated1',
+                shortDescription: 'post created by blogsId1 in params',
+                content: 'some content, created by blogsId in params'
+            })
+            .expect(201)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+            id: expect.any(String),
+            title: 'titleCreated1',
+            shortDescription: 'post created by blogsId1 in params',
+            content: 'some content, created by blogsId in params',
+            blogId: blogIdForPostsOperations,
+            blogName: blogNameForPostsOperations,
+            createdAt: expect.any(String)
+        })
+    })
 
 
 })
