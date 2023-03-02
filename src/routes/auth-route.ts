@@ -14,6 +14,7 @@ import {
 import {authService} from "../domain/auth-service";
 import {authRateLimiter} from "../middlewares/auth-rate-limiter";
 import {isEmailExistValidation} from "../middlewares/other-midlevares";
+import {usersQueryRepo} from "../repositories/users-query-repository";
 
 
 export const authRouter = Router({})
@@ -25,16 +26,22 @@ authRouter.post('/registration',
     emailValidation,
     inputValidationMiddleware,
     async (req: RequestWithBody<userInputModel>, res: Response) => {
-        const newUser = await authService.registerUser(
+    try {
+        const newUserId = await authService.registerUser(
             req.body.login,
             req.body.password,
             req.body.email)
-        if (newUser) {
-            res.status(204).send(newUser)
+        if (newUserId) {
+            const user = await usersQueryRepo.getUserById(newUserId)
+            res.status(204).send(user)
         }
         else {
             res.sendStatus(400)
         }
+    } catch (error) {
+        res.status(500).send(`controller registration error: ${(error as any).message}`)
+    }
+
     })
 
 authRouter.post('/registration-email-resending',

@@ -83,13 +83,16 @@ export type createCommentModel = {
     content: string
 }
 
-export type requestBlogsQueryModel = {
-    searchNameTerm: string,
+type QueryParamsType = {
     sortBy: string,
     sortDirection: string,
     pageNumber: string,
     pageSize: string,
 }
+
+export type requestBlogsQueryModel = {
+    searchNameTerm: string,
+} & QueryParamsType
 
 export type requestUsersQueryModel = {
     sortBy: string,
@@ -123,12 +126,12 @@ export type requestCommentsByPostIdQueryModel = {
 }
 
 
-export type paginationBlogOutputModel = {
+export type paginationOutputModel<T> = {
     pagesCount: number,
     page: number,
     pageSize: number,
     totalCount: number,
-    items: any
+    items: T[]
 }
 
 export type paginationPostOutputModel = {

@@ -4,14 +4,13 @@ import {blogType, commentType, postType, userDeviceDBType, userType} from "../mo
 
 
 export const userSchema = new mongoose.Schema<userType>({
-    _id: ObjectId,
     login: String,
     passwordHash: String,
     passwordSalt: String,
     email: String,
     createdAt: String,
     confirmationCode: String,
-    expirationDate: Date,
+    expirationDateOfConfirmationCode: Date,
     isConfirmed: Boolean,
     passwordRecoveryCode: String,
     expirationDateOfRecoveryCode: Date,

@@ -1,7 +1,7 @@
 
 import {blogsRepository} from "./blogs-repository";
 import {blogType, blogTypeOutput} from "../models/types";
-import {paginationBlogOutputModel, requestBlogsQueryModel} from "../models/models";
+import {paginationOutputModel, requestBlogsQueryModel} from "../models/models";
 import {BlogModel} from "../schemes/schemes";
 
 function sort(sortDirection: string){
@@ -53,7 +53,7 @@ export const blogsQueryRepo = {
 
         let pageCount = Math.ceil(blogsCount / +pageSize)
 
-        let outputBlogs: paginationBlogOutputModel  = {
+        let outputBlogs: paginationOutputModel<blogTypeOutput>  = {
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,

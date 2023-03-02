@@ -1,11 +1,33 @@
 import {ObjectId} from "mongodb";
-import {userType, userTypeOutput} from "../models/types";
+import {userType, UserTypeOutput} from "../models/types";
 import {usersRepository} from "../repositories/users-repository";
 import * as bcrypt from 'bcrypt'
 
+const getUserDto = (login: string,
+                    password: string,
+                    email: string,
+                    isConfirmed: boolean,
+                    passwordHash: string,
+                    passwordSalt: string): userType => {
+    return {
+        _id: new ObjectId(),
+        "login": login,
+        passwordHash,
+        passwordSalt,
+        "email": email,
+        "createdAt": new Date().toISOString(),
+        "confirmationCode": "none",
+        "expirationDateOfConfirmationCode": new Date(),
+        "isConfirmed": true,
+        'passwordRecoveryCode': "none",
+        'expirationDateOfRecoveryCode': new Date()
+    }
+
+}
+
 export const usersService = {
 
-    async createUser(login: string, password: string, email: string): Promise<userTypeOutput> {
+    async createUser(login: string, password: string, email: string): Promise<string> {
 
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
@@ -18,13 +40,13 @@ export const usersService = {
             "email": email,
             "createdAt": new Date().toISOString(),
             "confirmationCode": "none",
-            "expirationDate": new Date(),
+            "expirationDateOfConfirmationCode": new Date(),
             "isConfirmed": true,
             'passwordRecoveryCode': "none",
             'expirationDateOfRecoveryCode': new Date()
         }
         const createdUser = await usersRepository.createUser(newUser)
-        return createdUser
+        return createdUser._id.toString()
     },
 
     async _generateHash(password: string, salt: string){

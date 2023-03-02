@@ -11,7 +11,7 @@ export type postTypeOutput = {
     createdAt: string
 }
 export type postType = {
-    _id: string | ObjectId,
+    _id: ObjectId,
     title: string,
     shortDescription: string,
     content: string,
@@ -47,13 +47,13 @@ export type userType = {
     email: string
     createdAt: string
     confirmationCode: string
-    expirationDate: Date,
+    expirationDateOfConfirmationCode: Date,
     isConfirmed: boolean,
     passwordRecoveryCode: string,
     expirationDateOfRecoveryCode: Date
 }
-export type userTypeOutput = {
-    id: string | ObjectId
+export type UserTypeOutput = {
+    id: string
     login: string
     email: string
     createdAt: string

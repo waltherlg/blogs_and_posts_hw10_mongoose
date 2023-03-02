@@ -5,13 +5,15 @@ import {response} from "express";
 import {blogsService} from "../../src/domain/blogs-service";
 import mongoose from "mongoose";
 import {postsService} from "../../src/domain/posts-service";
+import {testService} from "../../src/domain/test-service";
+import {ObjectId} from "mongodb";
 
 
 const basicAuthRight = Buffer.from('admin:qwerty').toString('base64');
 const basicAuthWrongPassword = Buffer.from('admin:12345').toString('base64');
 const basicAuthWrongLogin = Buffer.from('12345:qwerty').toString('base64');
 
-const notExistingId = '111111111111111111111111'
+const notExistingId = new ObjectId()
 describe('01 /blogs', () => {
 
     let createdBlogId: string
@@ -238,7 +240,7 @@ describe('01 /blogs', () => {
 
     it ('01-10 /blogs/:{blogId} DELETE = 404 if blogId not exist', async () => {
         await request(app)
-            .delete(`/blogs/:111111111111111111111111`)
+            .delete(`/blogs/${notExistingId}`)
             .set('Authorization', `Basic ${basicAuthRight}`)
             .expect(404)
     })
@@ -685,7 +687,7 @@ describe('01 /blogs', () => {
                 title: 'somePostTitle',
                 shortDescription: 'some short description',
                 content: 'some new content',
-                blogId: '111111111111111111111111'
+                blogId: notExistingId
             })
             .expect(400)
 
@@ -1139,9 +1141,9 @@ describe('01 /blogs', () => {
         const createResponse = await request(app)
             .post('/users')
             .set('Authorization', `Basic ${basicAuthRight}`)
-            .send({login: 'ruslan',
+            .send({login: 'ruslantest',
                 password: 'qwerty',
-                email: 'ismailovrt.it@gmail.com'
+                email: 'ruslan.it@luft-mail.com'
             })
             .expect(201)
 
@@ -1150,8 +1152,8 @@ describe('01 /blogs', () => {
 
         expect(createdResponse).toEqual({
             id: userIdForTests,
-            login: 'ruslan',
-            email: 'ismailovrt.it@gmail.com',
+            login: 'ruslantest',
+            email: 'ruslan.it@luft-mail.com',
             createdAt: expect.any(String)
         })
     })
@@ -1159,9 +1161,9 @@ describe('01 /blogs', () => {
     it('03-01 /users POST = 401 if no auth data', async () => {
         const createResponse = await request(app)
             .post('/users')
-            .send({login: 'ruslan',
+            .send({login: 'ruslantest',
                 password: 'qwerty',
-                email: 'ismailovrt.it@gmail.com'
+                email: 'ruslan.it@luft-mail.com'
             })
             .expect(401)
     })
@@ -1170,9 +1172,9 @@ describe('01 /blogs', () => {
         await request(app)
             .post('/users')
             .set('Authorization', `Basic ${basicAuthWrongPassword}`)
-            .send({login: 'ruslan',
+            .send({login: 'ruslantest',
                 password: 'qwerty',
-                email: 'ismailovrt.it@gmail.com'
+                email: 'ruslan.it@luft-mail.com'
             })
             .expect(401)
     })
@@ -1183,7 +1185,7 @@ describe('01 /blogs', () => {
             .set('Authorization', `Basic ${basicAuthRight}`)
             .send({
                 password: 'qwerty',
-                email: 'ismailovrt.it@gmail.com'
+                email: 'ruslan.it@luft-mail.com'
             })
             .expect(400)
 
@@ -1206,7 +1208,7 @@ describe('01 /blogs', () => {
             .set('Authorization', `Basic ${basicAuthRight}`)
             .send({login: 'ruslanbestrulessupermega',
                 password: 'qwerty',
-                email: 'ismailovrt.it@gmail.com'
+                email: 'ruslan.it@luft-mail.com'
             })
             .expect(400)
 
@@ -1227,9 +1229,9 @@ describe('01 /blogs', () => {
         const createResponse = await request(app)
             .post('/users')
             .set('Authorization', `Basic ${basicAuthRight}`)
-            .send({login: 'ruslan',
+            .send({login: 'ruslantest',
                 password: 'qwerty',
-                email: 'ismailovrt.it@luft-mail.com'
+                email: 'ruslan.it@luft-mail.com'
             })
             .expect(400)
 
@@ -1344,7 +1346,7 @@ describe('01 /blogs', () => {
             .set('Authorization', `Basic ${basicAuthRight}`)
             .send({login: 'ruslan2',
                 password: 'qwerty',
-                email: 'ismailovrt.it@gmail.com'
+                email: 'ruslan.it@luft-mail.com'
             })
             .expect(400)
 
@@ -1377,14 +1379,105 @@ describe('01 /blogs', () => {
             items: [
                 {
                     id: userIdForTests,
-                    login: 'ruslan',
-                    email: 'ismailovrt.it@gmail.com',
+                    login: 'ruslantest',
+                    email: 'ruslan.it@luft-mail.com',
                     createdAt: expect.any(String)
                 },
             ]
         })
     })
 
+    it('03-11 /users GET = 200 and array of users with pagination', async () => {
+        const createResponse = await request(app)
+            .get('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .expect(200)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+            pagesCount: 1,
+            page: 1,
+            pageSize: 10,
+            totalCount: 1,
+            items: [
+                {
+                    id: userIdForTests,
+                    login: 'ruslantest',
+                    email: 'ruslan.it@luft-mail.com',
+                    createdAt: expect.any(String)
+                },
+            ]
+        })
+    })
+
+    it('03-12 /users GET = 401 if no auth data', async () => {
+        await request(app)
+            .get('/users')
+            .expect(401)
+    })
+
+    it('03-13 /users/:{userId} DELETE = 401 if no auth data', async () => {
+        await request(app)
+            .delete(`/users/${userIdForTests}`)
+            .expect(401)
+    })
+
+    it('03-13 /users/:{userId} DELETE = 404 if id not exist', async () => {
+        await request(app)
+            .delete(`/users/1111111111111111`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .expect(404)
+    })
+
+    it('03-13 /users/:{userId} DELETE = 404 if all is OK', async () => {
+        await request(app)
+            .delete(`/users/${userIdForTests}`)
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .expect(204)
+    })
+
+    it('03-11 /users GET = 200 and empty array with pagination (after deleting user by id)', async () => {
+        const createResponse = await request(app)
+            .get('/users')
+            .set('Authorization', `Basic ${basicAuthRight}`)
+            .expect(200)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual({
+            pagesCount: 0,
+            page: 1,
+            pageSize: 10,
+            totalCount: 0,
+            items: [
+            ]
+        })
+    })
+
+    let userIdForTestsRegistration: string
+
+    it('04-00 /auth/registration POST = 204 and return new created user if all is OK', async () => {
+        const createResponse = await request(app)
+            .post('/auth/registration')
+            .send({login: 'ruslan',
+                password: 'qwerty',
+                email: 'ismailov.it@gmail.com'
+            })
+            .expect(204)
+
+        const createdResponse = createResponse.body
+        userIdForTestsRegistration = createdResponse.id
+    })
+
+    it('04-00 /auth/registration-confirmation POST = 204 if all is OK', async () => {
+
+        const confirmationCode = await testService.getConfirmationCode('ruslan')
+        await request(app)
+            .post('/auth/registration-confirmation')
+            .send({code: confirmationCode})
+            .expect(204)
+    })
 
 
 

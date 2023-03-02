@@ -1,23 +1,26 @@
 import {ObjectId} from "mongodb";
 import {userType} from "../models/types";
-import {userTypeOutput} from "../models/types";
+import {UserTypeOutput} from "../models/types";
 import {usersService} from "../domain/users-service";
 import {passwordRecoveryModel} from "../models/users-models";
 import {UserModel} from "../schemes/schemes";
+import {HydratedDocument} from "mongoose";
 
 //export const UserModel = client.db("blogsAndPosts").collection<userType>("users")
 
 export const usersRepository = {
+    async createUser(userDto: userType): Promise<HydratedDocument<userType>> {
+        const newUser = new UserModel(userDto)
 
-    async createUser(newUser: userType): Promise<userTypeOutput> {
-        const result = await UserModel.insertMany(newUser)
+        await newUser.save()
+        //const result = await UserModel.insertMany(newUser)
         let createdUser = {
             id: newUser._id.toString(),
             login: newUser.login,
             email: newUser.email,
             createdAt: newUser.createdAt
         }
-        return createdUser
+        return newUser
     },
 
     async deleteUser(id: string): Promise<boolean>{
@@ -67,7 +70,7 @@ export const usersRepository = {
     },
 
     async updateConfirmation(_id: ObjectId) {
-        let result = await UserModel.updateOne({_id}, {$set: {isConfirmed: true} })
+        let result = await UserModel.updateOne({_id}, {$set: {isConfirmed: true, confirmationCode: ""} })
         return result.modifiedCount === 1
     },
 

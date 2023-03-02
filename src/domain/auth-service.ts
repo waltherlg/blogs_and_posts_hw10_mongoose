@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {userDeviceDBType, userType, userTypeOutput} from "../models/types";
+import {userDeviceDBType, userType, UserTypeOutput} from "../models/types";
 import {usersRepository} from "../repositories/users-repository";
 import * as bcrypt from 'bcrypt'
 import {v4 as uuid4} from 'uuid'
@@ -9,23 +9,40 @@ import {usersService} from "./users-service";
 import {jwtService} from "../application/jwt-service";
 import {deviceService} from "./device-service";
 import {userDeviceRepo} from "../repositories/users-device-repository";
+import {testService} from "./test-service"
+
+type GenerateHashResponseType = {
+    passwordHash: string,
+    salt: string
+}
+
+const cryptoAdapter = {
+    async generateHash(password: string):Promise<GenerateHashResponseType> {
+        const salt = await bcrypt.genSalt(10)
+      const  passwordHash =  await bcrypt.hash(password, salt)
+
+        return  {
+            passwordHash, salt
+        }
+    }
+}
 
 export const authService = {
 
-    async registerUser(login: string, password: string, email: string): Promise<userTypeOutput | null> {
+    async registerUser(login: string, password: string, email: string): Promise<string | null> {
 
-        const passwordSalt = await bcrypt.genSalt(10)
-        const passwordHash = await this._generateHash(password, passwordSalt)
+        const {salt, passwordHash} = await cryptoAdapter.generateHash(password)
+        //const passwordHash = await this._generateHash(password, passwordSalt)
 
         const newUser: userType = {
             "_id": new ObjectId(),
             "login": login,
             passwordHash,
-            passwordSalt,
+            passwordSalt: salt,
             "email": email,
             "createdAt": new Date().toISOString(),
             "confirmationCode": uuid4(),
-            "expirationDate": add(new Date(),{
+            "expirationDateOfConfirmationCode": add(new Date(),{
                 hours: 1
                 //minutes: 3
             }),
@@ -33,7 +50,9 @@ export const authService = {
             'passwordRecoveryCode': "",
             'expirationDateOfRecoveryCode': new Date()
         }
+        await testService.saveConfirmationCode(newUser)
         const createdUser = await usersRepository.createUser(newUser)
+
         try {
             await emailManager.sendEmailConfirmationMessage(newUser)
         }
@@ -41,13 +60,13 @@ export const authService = {
             await usersService.deleteUser(newUser._id.toString())
             return null
         }
-        return createdUser
+        return createdUser._id.toString()
     },
 
     async confirmEmail(code: string){
         let user = await usersRepository.getUserByConfirmationCode(code)
         if (!user) return false
-        if (user.expirationDate > new Date()){
+        if (user.expirationDateOfConfirmationCode > new Date()){
             let result = await usersRepository.updateConfirmation(user._id)
             return result
         }
