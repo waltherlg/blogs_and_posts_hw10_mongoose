@@ -1,5 +1,5 @@
 import {emailAdapter} from "../adapters/email-adapter";
-import {passwordRecoveryModel} from "../models/users-models";
+import {PasswordRecoveryModel} from "../models/users-models";
 
 export const emailManager = {
     async sendEmailRecoveryMessage(user: any){
@@ -16,7 +16,7 @@ export const emailManager = {
         await emailAdapter.sendEmail(refreshConfirmationData.email, "resending confirmation code", confirmationCode)
     },
 
-    async sendPasswordRecoveryMessage(passwordRecoveryData: passwordRecoveryModel){
+    async sendPasswordRecoveryMessage(passwordRecoveryData: PasswordRecoveryModel){
         const passwordRecoveryCodeLink = `<a href='https://somesite.com/password-recovery?recoveryCode=${passwordRecoveryData.passwordRecoveryCode}">recovery password code</a>`
         await emailAdapter.sendEmail(passwordRecoveryData.email, "password recovery code", passwordRecoveryCodeLink)
     }

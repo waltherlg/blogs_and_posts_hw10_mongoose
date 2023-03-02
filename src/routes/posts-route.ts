@@ -12,10 +12,10 @@ import {
     RequestWithQuery
 } from "../models/types";
 import {
-    createCommentModel,
-    createPostModel, requestCommentsByPostIdQueryModel,
-    requestPostsQueryModel,
-    updatePostModel, URIParamsCommentModel,
+    CreateCommentModel,
+    CreatePostModel, RequestCommentsByPostIdQueryModel,
+    RequestPostsQueryModel,
+    UpdatePostModel, URIParamsCommentModel,
     URIParamsGetPostByBlogIdModel,
     URIParamsPostModel
 } from "../models/models";
@@ -34,7 +34,7 @@ import {existBlogIdValidation} from "../middlewares/input-validation-middleware/
 import {postsQueryRepo} from "../repositories/post-query-repository";
 
 // GET Returns All posts
-postsRouter.get('/', async (req: RequestWithQuery<requestPostsQueryModel>, res: Response) => {
+postsRouter.get('/', async (req: RequestWithQuery<RequestPostsQueryModel>, res: Response) => {
     try {
         let sortBy = req.query.sortBy ? req.query.sortBy : 'createdAt'
         let sortDirection = req.query.sortDirection ? req.query.sortDirection : 'desc'
@@ -75,7 +75,7 @@ postsRouter.post('/',
     contentValidation,
     existBlogIdValidation,
     inputValidationMiddleware,
-    async (req: RequestWithBody<createPostModel>, res: Response) => {
+    async (req: RequestWithBody<CreatePostModel>, res: Response) => {
         const newPost = await postsService.createPost(
             req.body.title,
             req.body.shortDescription,
@@ -89,7 +89,7 @@ postsRouter.post('/:postId/comments',
     authMiddleware,
     commentContentValidation,
     inputValidationMiddleware,
-    async (req: RequestWithParamsAndBody<URIParamsCommentModel, createCommentModel>, res: Response) => {
+    async (req: RequestWithParamsAndBody<URIParamsCommentModel, CreateCommentModel>, res: Response) => {
         let foundPost = await postsService.getPostByID(req.params.postId.toString())
         if (!foundPost){
             res.sendStatus(404)
@@ -106,7 +106,7 @@ postsRouter.post('/:postId/comments',
 
 // GET all comments by post id
 postsRouter.get('/:postId/comments',
-    async (req: RequestWithParamsAndQuery<URIParamsPostModel, requestCommentsByPostIdQueryModel>, res: Response) => {
+    async (req: RequestWithParamsAndQuery<URIParamsPostModel, RequestCommentsByPostIdQueryModel>, res: Response) => {
         const foundPost = await postsService.getPostByID(req.params.postId.toString())
         if (!foundPost) {
             res.sendStatus(404)
@@ -135,7 +135,7 @@ postsRouter.put('/:postId',
     titleValidation,
     contentValidation,
     inputValidationMiddleware,
-    async (req: RequestWithParamsAndBody<URIParamsPostModel, updatePostModel>, res: Response) => {
+    async (req: RequestWithParamsAndBody<URIParamsPostModel, UpdatePostModel>, res: Response) => {
         const updatePost = await postsService.updatePost(
             req.params.postId,
             req.body.title,

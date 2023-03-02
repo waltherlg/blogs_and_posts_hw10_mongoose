@@ -1,18 +1,18 @@
 
 import {ObjectId} from "mongodb";
-import {blogType} from "../models/types";
-import {blogTypeOutput} from "../models/types";
+import {BlogDBType} from "../models/types";
+import {BlogTypeOutput} from "../models/types";
 import {BlogModel} from "../schemes/schemes";
 
 
 export const blogsRepository = {
 
-    async getBlogByID(id: string): Promise<blogTypeOutput | null> {
+    async getBlogByID(id: string): Promise<BlogTypeOutput | null> {
         if(!ObjectId.isValid(id)){
             return null
         }
         let _id = new ObjectId(id)
-        const blog: blogType | null = await BlogModel.findOne({_id: _id})
+        const blog: BlogDBType | null = await BlogModel.findOne({_id: _id})
         if (!blog) {
             return null
         }
@@ -26,9 +26,9 @@ export const blogsRepository = {
         }
     },
 
-    async getAllBlogsWithoutPagination(): Promise<blogTypeOutput[]> {
+    async getAllBlogsWithoutPagination(): Promise<BlogTypeOutput[]> {
         let outBlogs = await BlogModel.find({}).lean()
-        return outBlogs.map((blogs: blogType) => ({
+        return outBlogs.map((blogs: BlogDBType) => ({
             id: blogs._id.toString(),
             name: blogs.name,
             description: blogs.description,
@@ -38,7 +38,7 @@ export const blogsRepository = {
         }))
     },
 
-    async createBlog(newBlog: blogType): Promise<blogTypeOutput> {
+    async createBlog(newBlog: BlogDBType): Promise<BlogTypeOutput> {
         const result = await BlogModel.create(newBlog)
         let createdBlog = {
             id: newBlog._id.toString(),

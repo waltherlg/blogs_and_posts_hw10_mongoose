@@ -1,7 +1,7 @@
 
 import {blogsRepository} from "./blogs-repository";
-import {blogType, blogTypeOutput} from "../models/types";
-import {paginationOutputModel, requestBlogsQueryModel} from "../models/models";
+import {BlogDBType, BlogTypeOutput} from "../models/types";
+import {PaginationOutputModel, RequestBlogsQueryModel} from "../models/models";
 import {BlogModel} from "../schemes/schemes";
 
 function sort(sortDirection: string){
@@ -40,7 +40,7 @@ export const blogsQueryRepo = {
                 .lean()
         }
 
-        let outBlogs = blogs.map((blogs: blogType) => {
+        let outBlogs = blogs.map((blogs: BlogDBType) => {
             return {
                 id: blogs._id.toString(),
                 name: blogs.name,
@@ -53,7 +53,7 @@ export const blogsQueryRepo = {
 
         let pageCount = Math.ceil(blogsCount / +pageSize)
 
-        let outputBlogs: paginationOutputModel<blogTypeOutput>  = {
+        let outputBlogs: PaginationOutputModel<BlogTypeOutput>  = {
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,

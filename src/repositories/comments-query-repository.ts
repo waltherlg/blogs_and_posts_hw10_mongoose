@@ -1,7 +1,7 @@
 
 import {sort} from "../application/functions";
 import {skipped} from "../application/functions";
-import {commentType} from "../models/types";
+import {CommentDBType} from "../models/types";
 import {CommentModel} from "../schemes/schemes";
 
 export const commentsQueryRepo = {
@@ -21,7 +21,7 @@ export const commentsQueryRepo = {
             .limit(+pageSize)
             .lean()
 
-        let outComments = comments.map((comments: commentType) => {
+        let outComments = comments.map((comments: CommentDBType) => {
             return {
                 id: comments._id.toString(),
                 content: comments.content,

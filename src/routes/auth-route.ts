@@ -1,7 +1,7 @@
 import {Request, Response, Router} from "express";
 import {usersService} from "../domain/users-service";
 import {RequestWithBody} from "../models/types";
-import {userAuthModel, userInputModel} from "../models/users-models";
+import {UserAuthModel, UserInputModel} from "../models/users-models";
 import {jwtService} from "../application/jwt-service";
 import {authMiddleware, refreshTokenCheck} from "../middlewares/basic-auth.middleware";
 import {
@@ -25,7 +25,7 @@ authRouter.post('/registration',
     passwordValidation,
     emailValidation,
     inputValidationMiddleware,
-    async (req: RequestWithBody<userInputModel>, res: Response) => {
+    async (req: RequestWithBody<UserInputModel>, res: Response) => {
     try {
         const newUserId = await authService.registerUser(
             req.body.login,
@@ -70,7 +70,7 @@ authRouter.post('/registration-confirmation',
 
 authRouter.post('/login',
     authRateLimiter.login,
-    async (req: RequestWithBody<userAuthModel>, res: Response) => {
+    async (req: RequestWithBody<UserAuthModel>, res: Response) => {
         const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
         if (user) {
             const {accessToken, refreshToken} = await authService.login(user, req.ip, req.headers['user-agent']!)

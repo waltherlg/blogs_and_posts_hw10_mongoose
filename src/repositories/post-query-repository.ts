@@ -1,6 +1,6 @@
 
-import {postType, postTypeOutput} from "../models/types";
-import {paginationOutputModel, paginationPostOutputModel} from "../models/models";
+import {PostDBType, PostTypeOutput} from "../models/types";
+import {PaginationOutputModel, PaginationPostOutputModel} from "../models/models";
 import {sort} from "../application/functions";
 import {skipped} from "../application/functions";
 import {PostModel} from "../schemes/schemes";
@@ -21,7 +21,7 @@ export const postsQueryRepo = {
             .limit(+pageSize)
             .lean()
 
-        let outPosts = posts.map((posts: postType) => {
+        let outPosts = posts.map((posts: PostDBType) => {
             return {
                 id: posts._id.toString(),
                 title: posts.title,
@@ -35,7 +35,7 @@ export const postsQueryRepo = {
 
         let pageCount = Math.ceil(+postsCount / +pageSize)
 
-        let outputPosts: paginationPostOutputModel = {
+        let outputPosts: PaginationPostOutputModel = {
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,
@@ -59,7 +59,7 @@ export const postsQueryRepo = {
             .sort({[sortBy]: sort(sortDirection)})
             .lean()
 
-        let outPosts = posts.map((posts: postType) => {
+        let outPosts = posts.map((posts: PostDBType) => {
             return {
                 id: posts._id.toString(),
                 title: posts.title,
@@ -75,7 +75,7 @@ export const postsQueryRepo = {
 
         let pageCount = Math.ceil(+postsCount / +pageSize)
 
-        let outputPosts: paginationOutputModel<postTypeOutput>  = {
+        let outputPosts: PaginationOutputModel<PostTypeOutput>  = {
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,

@@ -1,15 +1,15 @@
 import {ObjectId} from "mongodb";
-import {userType} from "../models/types";
+import {UserDBType} from "../models/types";
 import {UserTypeOutput} from "../models/types";
 import {usersService} from "../domain/users-service";
-import {passwordRecoveryModel} from "../models/users-models";
+import {PasswordRecoveryModel} from "../models/users-models";
 import {UserModel} from "../schemes/schemes";
 import {HydratedDocument} from "mongoose";
 
 //export const UserModel = client.db("blogsAndPosts").collection<userType>("users")
 
 export const usersRepository = {
-    async createUser(userDto: userType): Promise<HydratedDocument<userType>> {
+    async createUser(userDto: UserDBType): Promise<HydratedDocument<UserDBType>> {
         const newUser = new UserModel(userDto)
 
         await newUser.save()
@@ -37,20 +37,20 @@ export const usersRepository = {
         return result.acknowledged
     },
 
-    async getUserById(id: string): Promise<userType | null> {
+    async getUserById(id: string): Promise<UserDBType | null> {
         if (!ObjectId.isValid(id)){
             return null
         }
         let _id = new ObjectId(id)
-        const user: userType | null = await UserModel.findOne({_id: _id})
+        const user: UserDBType | null = await UserModel.findOne({_id: _id})
         if (!user){
             return null
         }
         return user
     },
 
-    async getUserByConfirmationCode(code: string): Promise<userType | null> {
-        const user: userType | null = await UserModel.findOne({confirmationCode: code})
+    async getUserByConfirmationCode(code: string): Promise<UserDBType | null> {
+        const user: UserDBType | null = await UserModel.findOne({confirmationCode: code})
         if (!user){
             return null
         }
@@ -64,8 +64,8 @@ export const usersRepository = {
         return user
     },
 
-    async findUserByLoginOrEmail(loginOrEmail: string): Promise<userType | null>{
-        const user: userType | null = await UserModel.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
+    async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserDBType | null>{
+        const user: UserDBType | null = await UserModel.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
         return user
     },
 
@@ -79,7 +79,7 @@ export const usersRepository = {
         return result.modifiedCount === 1
     },
 
-    async addPasswordRecoveryData(passwordRecoveryData: passwordRecoveryModel){
+    async addPasswordRecoveryData(passwordRecoveryData: PasswordRecoveryModel){
         let result = await UserModel.updateOne({email: passwordRecoveryData.email},
             {$set:
                     {passwordRecoveryCode: passwordRecoveryData.passwordRecoveryCode,

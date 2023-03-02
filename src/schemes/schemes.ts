@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import {ObjectId} from "mongodb";
-import {blogType, commentType, postType, userDeviceDBType, userType} from "../models/types";
+import {BlogDBType, CommentDBType, PostDBType, UserDeviceDBType, UserDBType} from "../models/types";
 
 
-export const userSchema = new mongoose.Schema<userType>({
+export const userSchema = new mongoose.Schema<UserDBType>({
     login: String,
     passwordHash: String,
     passwordSalt: String,
@@ -17,7 +17,7 @@ export const userSchema = new mongoose.Schema<userType>({
 })
 export const UserModel = mongoose.model('users', userSchema)
 
-export const blogSchema = new mongoose.Schema<blogType>({
+export const blogSchema = new mongoose.Schema<BlogDBType>({
     _id: ObjectId,
     name: String,
     description: String,
@@ -27,7 +27,7 @@ export const blogSchema = new mongoose.Schema<blogType>({
 })
 export const BlogModel = mongoose.model('blogs', blogSchema)
 
-export const postSchema = new mongoose.Schema<postType>({
+export const postSchema = new mongoose.Schema<PostDBType>({
     _id: ObjectId,
     title: String,
     shortDescription: String,
@@ -38,7 +38,7 @@ export const postSchema = new mongoose.Schema<postType>({
 })
 export const PostModel = mongoose.model('posts', postSchema)
 
-export const commentSchema = new mongoose.Schema<commentType>({
+export const commentSchema = new mongoose.Schema<CommentDBType>({
     _id: ObjectId,
     parentType: String,
     parentId: String,
@@ -49,7 +49,7 @@ export const commentSchema = new mongoose.Schema<commentType>({
 })
 export const CommentModel = mongoose.model('comments', commentSchema)
 
-export const userDeviceSchema = new mongoose.Schema<userDeviceDBType>({
+export const userDeviceSchema = new mongoose.Schema<UserDeviceDBType>({
     _id: ObjectId,
     userId: ObjectId,
     ip: String,

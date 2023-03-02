@@ -1,14 +1,14 @@
 //import {client} from "./db";
 import {ObjectId} from "mongodb";
-import {commentType} from "../models/types";
-import {commentTypeOutput} from "../models/types";
+import {CommentDBType} from "../models/types";
+import {CommentTypeOutput} from "../models/types";
 import {CommentModel} from "../schemes/schemes";
 
 //export const commentsCollection = client.db("blogsAndPosts").collection<commentType>("comments")
 
 export const commentsRepository = {
 
-    async createComment(newComment: commentType): Promise<commentTypeOutput> {
+    async createComment(newComment: CommentDBType): Promise<CommentTypeOutput> {
         const result = await CommentModel.insertMany(newComment)
         let createdComment = {
             id: newComment._id.toString(),
@@ -20,12 +20,12 @@ export const commentsRepository = {
         return createdComment
     },
 
-    async getCommentById(id: string): Promise<commentTypeOutput | null> {
+    async getCommentById(id: string): Promise<CommentTypeOutput | null> {
         if(!ObjectId.isValid(id)){
             return null
         }
         let _id = new ObjectId(id)
-        const comment: commentType | null = await CommentModel.findOne({_id: _id})
+        const comment: CommentDBType | null = await CommentModel.findOne({_id: _id})
         if (!comment) {
             return null
         }

@@ -23,9 +23,9 @@ import {basicAuthMiddleware} from "../middlewares/basic-auth.middleware";
 import {descriptionValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {websiteUrlValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {
-    createBlogModel, createPostModel,
-    requestBlogsQueryModel, requestPostsByBlogsIdQueryModel,
-    updateBlogModel,
+    CreateBlogModel, CreatePostModel,
+    RequestBlogsQueryModel, RequestPostsByBlogsIdQueryModel,
+    UpdateBlogModel,
     URIParamsBlogModel,
     URIParamsIDBlogModel
 } from "../models/models";
@@ -34,7 +34,7 @@ import {postsQueryRepo} from "../repositories/post-query-repository";
 
 
 // GET Returns All blogs
-blogsRouter.get('/', async (req: RequestWithQuery<requestBlogsQueryModel>, res: Response) => {
+blogsRouter.get('/', async (req: RequestWithQuery<RequestBlogsQueryModel>, res: Response) => {
     try {
         let searchNameTerm = req.query.searchNameTerm ? req.query.searchNameTerm: ''
         let sortBy = req.query.sortBy ? req.query.sortBy : 'createdAt'
@@ -61,7 +61,7 @@ blogsRouter.post('/',
     descriptionValidation,
     websiteUrlValidation,
     inputValidationMiddleware,
-    async (req: RequestWithBody<createBlogModel>, res: Response) => {
+    async (req: RequestWithBody<CreateBlogModel>, res: Response) => {
         const newBlog = await blogsService.createBlog(
             req.body.name,
             req.body.description,
@@ -77,7 +77,7 @@ blogsRouter.post('/:blogId/posts',
     shortDescriptionValidation,
     contentValidation,
     inputValidationMiddleware,
-    async (req: RequestWithParamsAndBody<URIParamsIDBlogModel, createPostModel>, res: Response) => {
+    async (req: RequestWithParamsAndBody<URIParamsIDBlogModel, CreatePostModel>, res: Response) => {
         let foundBlog = await blogsService.getBlogByID(req.params.blogId.toString())
         if(!foundBlog){
             res.sendStatus(404)
@@ -105,7 +105,7 @@ blogsRouter.get('/:id', async (req: RequestWithParams<URIParamsBlogModel>, res: 
 })
 
 //GET all posts by blogs id
-blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<URIParamsBlogModel, requestPostsByBlogsIdQueryModel>, res: Response) => {
+blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<URIParamsBlogModel, RequestPostsByBlogsIdQueryModel>, res: Response) => {
     let foundBlog = await blogsService.getBlogByID(req.params.id.toString()) // check is blog exist
     if(!foundBlog){
         res.sendStatus(404)
@@ -149,7 +149,7 @@ blogsRouter.put('/:id',
     descriptionValidation,
     websiteUrlValidation,
     inputValidationMiddleware,
-    async (req: RequestWithParamsAndBody<URIParamsBlogModel, updateBlogModel>, res) => {
+    async (req: RequestWithParamsAndBody<URIParamsBlogModel, UpdateBlogModel>, res) => {
     const updateBlog = await blogsService
         .updateBlog(
             req.params.id,

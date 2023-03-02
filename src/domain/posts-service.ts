@@ -1,17 +1,17 @@
 import {postsRepository} from "../repositories/posts-repository";
 import {ObjectId} from "mongodb";
-import {postType} from "../models/types";
-import {postTypeOutput} from "../models/types";
+import {PostDBType} from "../models/types";
+import {PostTypeOutput} from "../models/types";
 import {blogsService} from "./blogs-service";
 
 
 export const postsService = {
 
-    async getPostByID(id: string): Promise<postTypeOutput | null> {
+    async getPostByID(id: string): Promise<PostTypeOutput | null> {
         return await postsRepository.getPostByID(id)
     },
 
-    async getPostByBlogsID(blogId: string): Promise<postTypeOutput | null> {
+    async getPostByBlogsID(blogId: string): Promise<PostTypeOutput | null> {
         return await postsRepository.getPostByBlogsID(blogId)
     },
 
@@ -19,10 +19,10 @@ export const postsService = {
         title: string,
         shortDescription: string,
         content: string,
-        blogId: string): Promise<postTypeOutput> {
+        blogId: string): Promise<PostTypeOutput> {
         let foundBlog = await blogsService.getBlogByID(blogId)
         const blogName = foundBlog!.name
-        const newPost: postType = {
+        const newPost: PostDBType = {
             "_id": new ObjectId(),
             "title": title,
             "shortDescription": shortDescription,
@@ -39,10 +39,10 @@ export const postsService = {
         title: string,
         shortDescription: string,
         content: string,
-        blogId: string): Promise<postTypeOutput> {
+        blogId: string): Promise<PostTypeOutput> {
         let foundBlog = await blogsService.getBlogByID(blogId)
         const blogName =  foundBlog!.name
-        const newPost: postType = {
+        const newPost: PostDBType = {
             "_id": new ObjectId(),
             "title": title,
             "shortDescription": shortDescription,

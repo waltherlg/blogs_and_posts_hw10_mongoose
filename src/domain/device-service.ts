@@ -1,6 +1,6 @@
 import {ObjectId} from "mongodb";
 import {userDeviceRepo} from "../repositories/users-device-repository";
-import {userDeviceOutputType} from "../models/types";
+import {UserDeviceOutputType} from "../models/types";
 import {jwtService} from "../application/jwt-service";
 import {tr} from "date-fns/locale";
 

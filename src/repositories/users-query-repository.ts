@@ -1,6 +1,6 @@
-import {userType, UserTypeOutput} from "../models/types";
+import {UserDBType, UserTypeOutput} from "../models/types";
 import {usersRepository} from "./users-repository";
-import {paginationUserOutputModel} from "../models/models";
+import {PaginationUserOutputModel} from "../models/models";
 import {UserModel} from "../schemes/schemes";
 import {ObjectId} from "mongodb";
 
@@ -32,7 +32,7 @@ export const usersQueryRepo = {
             .limit(+pageSize)
             .lean()
 
-        let outUsers = users.map((users: userType) => {
+        let outUsers = users.map((users: UserDBType) => {
             return {
                 id: users._id.toString(),
                 login: users.login,
@@ -43,7 +43,7 @@ export const usersQueryRepo = {
 
         let pageCount = Math.ceil(usersCount / +pageSize)
 
-        let outputUsers: paginationUserOutputModel = {
+        let outputUsers: PaginationUserOutputModel = {
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,

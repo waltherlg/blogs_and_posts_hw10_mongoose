@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {userDeviceDBType, userType, UserTypeOutput} from "../models/types";
+import {UserDeviceDBType, UserDBType, UserTypeOutput} from "../models/types";
 import {usersRepository} from "../repositories/users-repository";
 import * as bcrypt from 'bcrypt'
 import {v4 as uuid4} from 'uuid'
@@ -9,7 +9,7 @@ import {usersService} from "./users-service";
 import {jwtService} from "../application/jwt-service";
 import {deviceService} from "./device-service";
 import {userDeviceRepo} from "../repositories/users-device-repository";
-import {testService} from "./test-service"
+
 
 type GenerateHashResponseType = {
     passwordHash: string,
@@ -34,7 +34,7 @@ export const authService = {
         const {salt, passwordHash} = await cryptoAdapter.generateHash(password)
         //const passwordHash = await this._generateHash(password, passwordSalt)
 
-        const newUser: userType = {
+        const newUser: UserDBType = {
             "_id": new ObjectId(),
             "login": login,
             passwordHash,
@@ -50,7 +50,6 @@ export const authService = {
             'passwordRecoveryCode': "",
             'expirationDateOfRecoveryCode': new Date()
         }
-        await testService.saveConfirmationCode(newUser)
         const createdUser = await usersRepository.createUser(newUser)
 
         try {
@@ -143,13 +142,13 @@ export const authService = {
     //     return !!isToken
     // },
 
-    async login(user: userType, ip: string, userAgent: string) {
+    async login(user: UserDBType, ip: string, userAgent: string) {
         const deviceId = new ObjectId()
         const accessToken = await jwtService.createJWT(user)
         const refreshToken = await jwtService.createJWTRefresh(user, deviceId)
         const lastActiveDate = await jwtService.getLastActiveDateFromRefreshToken(refreshToken)
         const expirationDate = await jwtService.getExpirationDateFromRefreshToken(refreshToken)
-        const deviceInfo: userDeviceDBType = {
+        const deviceInfo: UserDeviceDBType = {
             _id: deviceId,
             userId: user._id,
             ip,
@@ -167,7 +166,7 @@ export const authService = {
         return isDeviceDeleted
     },
 
-    async refreshingToken(user: userType, refreshToken: string){
+    async refreshingToken(user: UserDBType, refreshToken: string){
         const deviceId = await jwtService.getDeviceIdFromRefreshToken(refreshToken)
         const accessToken = await jwtService.createJWT(user)
         const newRefreshedToken = await jwtService.createJWTRefresh(user, deviceId)

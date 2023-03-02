@@ -1,11 +1,11 @@
-import {userDeviceDBType, userDeviceOutputType} from "../models/types";
+import {UserDeviceDBType, UserDeviceOutputType} from "../models/types";
 import {ObjectId} from "mongodb";
 import {UserDeviceModel} from "../schemes/schemes";
 
 //export const userDeviceCollection = client.db("blogsAndPosts").collection<userDeviceDBType>("userDevices")
 export const userDeviceRepo = {
 
-    async addDeviceInfo(newDevice: userDeviceDBType): Promise<boolean> {
+    async addDeviceInfo(newDevice: UserDeviceDBType): Promise<boolean> {
         const result = await UserDeviceModel.insertMany(newDevice);
         return true
     },

@@ -1,6 +1,6 @@
 import {Response, Router} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../models/types";
-import {userInputModel, userParamURIModel} from "../models/users-models";
+import {UserInputModel, UserParamURIModel} from "../models/users-models";
 
 import {usersService} from "../domain/users-service";
 import {basicAuthMiddleware} from "../middlewares/basic-auth.middleware";
@@ -9,7 +9,7 @@ import {
     inputValidationMiddleware,
     loginValidation, passwordValidation
 } from "../middlewares/input-validation-middleware/input-validation-middleware";
-import {requestUsersQueryModel} from "../models/models";
+import {RequestUsersQueryModel} from "../models/models";
 import {usersRepository} from "../repositories/users-repository";
 import {usersQueryRepo} from "../repositories/users-query-repository";
 
@@ -22,18 +22,22 @@ usersRouter.post('/',
     passwordValidation,
     emailValidation,
     inputValidationMiddleware,
-    async (req: RequestWithBody<userInputModel>, res: Response) => {
-    const newUser = await usersService.createUser(
+    async (req: RequestWithBody<UserInputModel>, res: Response) => {
+    const newUserId = await usersService.createUser(
         req.body.login,
         req.body.password,
         req.body.email)
+        const newUser = await usersQueryRepo.getUserById(newUserId)
+        if (!newUser){
+            res.sendStatus(500)
+        }
         res.status(201).send(newUser)
 
     })
 
 usersRouter.delete('/:id',
     basicAuthMiddleware,
-    async (req: RequestWithParams<userParamURIModel>, res: Response) => {
+    async (req: RequestWithParams<UserParamURIModel>, res: Response) => {
     const isUserDeleted = await usersService.deleteUser(req.params.id)
         if (isUserDeleted) {
             res.sendStatus(204)
@@ -45,7 +49,7 @@ usersRouter.delete('/:id',
 
 usersRouter.get('/',
     basicAuthMiddleware,
-    async (req: RequestWithQuery<requestUsersQueryModel>, res: Response) =>{
+    async (req: RequestWithQuery<RequestUsersQueryModel>, res: Response) =>{
     try {
         let sortBy = req.query.sortBy ? req.query.sortBy: 'createdAt'
         let sortDirection = req.query.sortDirection ? req.query.sortDirection: 'desc'

@@ -5,8 +5,9 @@ import {response} from "express";
 import {blogsService} from "../../src/domain/blogs-service";
 import mongoose from "mongoose";
 import {postsService} from "../../src/domain/posts-service";
-import {testService} from "../../src/domain/test-service";
 import {ObjectId} from "mongodb";
+import {usersQueryRepo} from "../../src/repositories/users-query-repository";
+import {UserModel} from "../../src/schemes/schemes";
 
 
 const basicAuthRight = Buffer.from('admin:qwerty').toString('base64');
@@ -1185,7 +1186,7 @@ describe('01 /blogs', () => {
             .set('Authorization', `Basic ${basicAuthRight}`)
             .send({
                 password: 'qwerty',
-                email: 'ruslan.it@luft-mail.com'
+                email: 'ruslan0303.it@luft-mail.com'
             })
             .expect(400)
 
@@ -1208,7 +1209,7 @@ describe('01 /blogs', () => {
             .set('Authorization', `Basic ${basicAuthRight}`)
             .send({login: 'ruslanbestrulessupermega',
                 password: 'qwerty',
-                email: 'ruslan.it@luft-mail.com'
+                email: 'ruslan0304.it@luft-mail.com'
             })
             .expect(400)
 
@@ -1231,7 +1232,7 @@ describe('01 /blogs', () => {
             .set('Authorization', `Basic ${basicAuthRight}`)
             .send({login: 'ruslantest',
                 password: 'qwerty',
-                email: 'ruslan.it@luft-mail.com'
+                email: 'ruslan0305.it@luft-mail.com'
             })
             .expect(400)
 
@@ -1472,7 +1473,12 @@ describe('01 /blogs', () => {
 
     it('04-00 /auth/registration-confirmation POST = 204 if all is OK', async () => {
 
-        const confirmationCode = await testService.getConfirmationCode('ruslan')
+        //const confirmationCode = await testService.getConfirmationCode('ruslan')
+        const user = await UserModel.findOne({_id: new ObjectId(userIdForTestsRegistration)})
+        if(!user){
+            return null
+        }
+        const confirmationCode = user.confirmationCode
         await request(app)
             .post('/auth/registration-confirmation')
             .send({code: confirmationCode})

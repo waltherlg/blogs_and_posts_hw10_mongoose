@@ -1,22 +1,22 @@
 import {v4 as uuid4} from "uuid";
 import add from "date-fns/add";
 
-export type userParamURIModel = {
+export type UserParamURIModel = {
     id: string
 }
 
-export type userInputModel = {
+export type UserInputModel = {
     login: string,
     password: string,
     email: string,
 }
 
-export type userAuthModel = {
+export type UserAuthModel = {
     loginOrEmail: string,
     password: string
 }
 
-export type passwordRecoveryModel = {
+export type PasswordRecoveryModel = {
     email: string,
     passwordRecoveryCode: string,
     expirationDateOfRecoveryCode: Date

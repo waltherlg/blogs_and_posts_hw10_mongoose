@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {userType, UserTypeOutput} from "../models/types";
+import {UserDBType, UserTypeOutput} from "../models/types";
 import {usersRepository} from "../repositories/users-repository";
 import * as bcrypt from 'bcrypt'
 
@@ -8,7 +8,7 @@ const getUserDto = (login: string,
                     email: string,
                     isConfirmed: boolean,
                     passwordHash: string,
-                    passwordSalt: string): userType => {
+                    passwordSalt: string): UserDBType => {
     return {
         _id: new ObjectId(),
         "login": login,
@@ -32,7 +32,7 @@ export const usersService = {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
 
-        const newUser: userType = {
+        const newUser: UserDBType = {
             "_id": new ObjectId(),
             "login": login,
             passwordHash,
@@ -64,7 +64,7 @@ export const usersService = {
         return user
     },
 
-    async getUserById(id: string): Promise<userType | null> {
+    async getUserById(id: string): Promise<UserDBType | null> {
         return await usersRepository.getUserById(id)
     },
 

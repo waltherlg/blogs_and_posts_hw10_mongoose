@@ -1,7 +1,7 @@
 import {ObjectId} from "mongodb";
 import {Request} from "express";
 
-export type postTypeOutput = {
+export type PostTypeOutput = {
     id: string,
     title: string,
     shortDescription: string,
@@ -10,7 +10,7 @@ export type postTypeOutput = {
     blogName: string,
     createdAt: string
 }
-export type postType = {
+export type PostDBType = {
     _id: ObjectId,
     title: string,
     shortDescription: string,
@@ -22,7 +22,7 @@ export type postType = {
 
 // type | interface | class
 
-export type blogTypeOutput = {
+export type BlogTypeOutput = {
     id: string,
     name: string,
     description: string,
@@ -30,7 +30,7 @@ export type blogTypeOutput = {
     createdAt: string
     isMembership: boolean
 }
-export type blogType = {
+export type BlogDBType = {
     _id: ObjectId,
     name: string,
     description: string,
@@ -39,7 +39,7 @@ export type blogType = {
     isMembership: boolean
 }
 
-export type userType = {
+export type UserDBType = {
     _id: ObjectId
     login: string
     passwordHash: string
@@ -59,17 +59,17 @@ export type UserTypeOutput = {
     createdAt: string
 }
 
-export type commentType = {
+export type CommentDBType = {
     _id:	string | ObjectId,
-    "parentType": string,
-    "parentId": string,
+    parentType: string,
+    parentId: string,
     content:	string
     userId:	string
     userLogin:	string
     createdAt:	string
 }
 
-export type commentTypeOutput = {
+export type CommentTypeOutput = {
     id:	string
     content: string
     userId:	string
@@ -77,7 +77,7 @@ export type commentTypeOutput = {
     createdAt:	string
 }
 
-export type userDeviceDBType = {
+export type UserDeviceDBType = {
     _id: ObjectId,
     userId: ObjectId,
     ip: string,
@@ -86,7 +86,7 @@ export type userDeviceDBType = {
     expirationDate: string
 }
 
-export type userDeviceOutputType = {
+export type UserDeviceOutputType = {
     ip: string,
     title: string | unknown | null,
     lastActiveDate: string,

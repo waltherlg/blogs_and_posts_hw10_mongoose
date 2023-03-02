@@ -1,4 +1,4 @@
-import {blogTypeOutput} from "./types";
+import {BlogTypeOutput} from "./types";
 
 export type URIParamsPostModel = {
     /**
@@ -53,33 +53,33 @@ export type URIParamsCommentModel = {
     postId: string
 }
 
-export type createPostModel = {
+export type CreatePostModel = {
     title: string,
     shortDescription: string,
     content: string,
     blogId: string,
 }
 
-export type updatePostModel = {
+export type UpdatePostModel = {
     title: string,
     shortDescription: string,
     content: string,
     blogId: string,
 }
 
-export type createBlogModel = {
+export type CreateBlogModel = {
     name: string,
     description: string,
     websiteUrl: string,
 }
 
-export type updateBlogModel = {
+export type UpdateBlogModel = {
     name: string,
     description: string,
     websiteUrl: string,
 }
 
-export type createCommentModel = {
+export type CreateCommentModel = {
     content: string
 }
 
@@ -90,11 +90,11 @@ type QueryParamsType = {
     pageSize: string,
 }
 
-export type requestBlogsQueryModel = {
+export type RequestBlogsQueryModel = {
     searchNameTerm: string,
 } & QueryParamsType
 
-export type requestUsersQueryModel = {
+export type RequestUsersQueryModel = {
     sortBy: string,
     sortDirection: string,
     pageNumber: string,
@@ -104,21 +104,21 @@ export type requestUsersQueryModel = {
 
 }
 
-export type requestPostsQueryModel = {
+export type RequestPostsQueryModel = {
     sortBy: string,
     sortDirection: string,
     pageNumber: string,
     pageSize: string,
 }
 
-export type requestPostsByBlogsIdQueryModel = {
+export type RequestPostsByBlogsIdQueryModel = {
     sortBy: string,
     sortDirection: string,
     pageNumber: string,
     pageSize: string,
 }
 
-export type requestCommentsByPostIdQueryModel = {
+export type RequestCommentsByPostIdQueryModel = {
     sortBy: string,
     sortDirection: string,
     pageNumber: string,
@@ -126,7 +126,7 @@ export type requestCommentsByPostIdQueryModel = {
 }
 
 
-export type paginationOutputModel<T> = {
+export type PaginationOutputModel<T> = {
     pagesCount: number,
     page: number,
     pageSize: number,
@@ -134,7 +134,7 @@ export type paginationOutputModel<T> = {
     items: T[]
 }
 
-export type paginationPostOutputModel = {
+export type PaginationPostOutputModel = {
     pagesCount: number,
     page: number,
     pageSize: number,
@@ -142,7 +142,7 @@ export type paginationPostOutputModel = {
     items: any
 }
 
-export type paginationUserOutputModel = {
+export type PaginationUserOutputModel = {
     pagesCount: number,
     page: number,
     pageSize: number,
