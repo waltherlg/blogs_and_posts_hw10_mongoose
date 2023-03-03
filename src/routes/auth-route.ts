@@ -71,9 +71,9 @@ authRouter.post('/registration-confirmation',
 authRouter.post('/login',
     authRateLimiter.login,
     async (req: RequestWithBody<UserAuthModel>, res: Response) => {
-        const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
-        if (user) {
-            const {accessToken, refreshToken} = await authService.login(user, req.ip, req.headers['user-agent']!)
+        const userId = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
+        if (userId) {
+            const {accessToken, refreshToken} = await authService.login(userId, req.ip, req.headers['user-agent']!)
             res.status(200).cookie("refreshToken", refreshToken, {httpOnly: true, secure: true}).send({accessToken})
         } else res.sendStatus(401)
     })
@@ -81,26 +81,23 @@ authRouter.post('/login',
 authRouter.post('/refresh-token',
     refreshTokenCheck,
     async (req: Request, res: Response) => {
-        const {accessToken, newRefreshedToken} = await authService.refreshingToken(req.user!, req.cookies!.refreshToken)
+        const {accessToken, newRefreshedToken} = await authService.refreshingToken(req.cookies!.refreshToken)
         res.status(200).cookie("refreshToken", newRefreshedToken, {httpOnly: true, secure: true}).send({accessToken})
     })
 
 authRouter.get('/me',
     authMiddleware,
     async (req: Request, res: Response) => {
-        const currentUserInfo = {
-            "email": req.user!.email,
-            "login": req.user!.login,
-            "userId": req.user!._id
-        }
+        const token = req.headers.authorization!.split(' ')[1]
+        const userId = await jwtService.getUserIdFromRefreshToken(token)
+        const currentUserInfo = await usersService.currentUserInfo(userId)
         res.status(200).send(currentUserInfo)
-
     })
 
 authRouter.post('/logout',
     refreshTokenCheck,
     async (req: Request, res: Response) => {
-        const isLogout = await authService.logout(req.user!._id, req.cookies!.refreshToken)
+        const isLogout = await authService.logout(req.cookies!.refreshToken)
         if (isLogout) res.cookie("refreshToken", "", {httpOnly: true, secure: true}).sendStatus(204)
         else res.status(404).send("no logout")
     })

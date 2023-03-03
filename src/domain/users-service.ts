@@ -2,6 +2,7 @@ import {ObjectId} from "mongodb";
 import {UserDBType, UserTypeOutput} from "../models/types";
 import {usersRepository} from "../repositories/users-repository";
 import * as bcrypt from 'bcrypt'
+import {usersQueryRepo} from "../repositories/users-query-repository";
 
 const getUserDto = (login: string,
                     password: string,
@@ -49,6 +50,18 @@ export const usersService = {
         return createdUser._id.toString()
     },
 
+    async currentUserInfo(userId: string){
+        const user = await usersQueryRepo.getUserById(userId)
+        if (!user) {
+            return "null"
+        }
+        return {
+            email: user.email,
+            login: user.login,
+            userId
+        }
+    },
+
     async _generateHash(password: string, salt: string){
         const hash = await bcrypt.hash(password, salt)
         return hash
@@ -61,7 +74,7 @@ export const usersService = {
         if (user.passwordHash !== passwordHash){
             return false
         }
-        return user
+        return user._id
     },
 
     async getUserById(id: string): Promise<UserDBType | null> {

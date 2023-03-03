@@ -95,35 +95,15 @@ export type RequestBlogsQueryModel = {
 } & QueryParamsType
 
 export type RequestUsersQueryModel = {
-    sortBy: string,
-    sortDirection: string,
-    pageNumber: string,
-    pageSize: string,
     searchLoginTerm: string,
     searchEmailTerm: string,
+} & QueryParamsType
 
-}
+export type RequestPostsQueryModel = QueryParamsType
 
-export type RequestPostsQueryModel = {
-    sortBy: string,
-    sortDirection: string,
-    pageNumber: string,
-    pageSize: string,
-}
+export type RequestPostsByBlogsIdQueryModel = QueryParamsType
 
-export type RequestPostsByBlogsIdQueryModel = {
-    sortBy: string,
-    sortDirection: string,
-    pageNumber: string,
-    pageSize: string,
-}
-
-export type RequestCommentsByPostIdQueryModel = {
-    sortBy: string,
-    sortDirection: string,
-    pageNumber: string,
-    pageSize: string,
-}
+export type RequestCommentsByPostIdQueryModel = QueryParamsType
 
 
 export type PaginationOutputModel<T> = {
@@ -134,19 +114,19 @@ export type PaginationOutputModel<T> = {
     items: T[]
 }
 
-export type PaginationPostOutputModel = {
-    pagesCount: number,
-    page: number,
-    pageSize: number,
-    totalCount: number,
-    items: any
-}
-
-export type PaginationUserOutputModel = {
-    pagesCount: number,
-    page: number,
-    pageSize: number,
-    totalCount: number,
-    items: any
-}
+// export type PaginationPostOutputModel = {
+//     pagesCount: number,
+//     page: number,
+//     pageSize: number,
+//     totalCount: number,
+//     items: any
+// }
+//
+// export type PaginationUserOutputModel = {
+//     pagesCount: number,
+//     page: number,
+//     pageSize: number,
+//     totalCount: number,
+//     items: any
+// }
 

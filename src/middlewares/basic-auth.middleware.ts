@@ -3,6 +3,7 @@ import {usersService} from "../domain/users-service";
 import {authService} from "../domain/auth-service";
 import {jwtService} from "../application/jwt-service";
 import {deviceService} from "../domain/device-service";
+import {checkService} from "../domain/check-service";
 
 
 export const basicAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -33,7 +34,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
     const userId = await jwtService.getUserIdFromRefreshToken(token)
     if (userId) {
-        req.user = await usersService.getUserById(userId)
+        //req.user = await usersService.getUserById(userId)
         next()
         return
     }
@@ -56,8 +57,8 @@ export const refreshTokenCheck = async (req: Request, res: Response, next: NextF
         res.status(401).send("no device in cookies")
         return
     }
-    const user = await usersService.getUserById(userId)
-    if (!user) return res.status(401).send('user not found')
+    const isUserExist = await checkService.isUserExist(userId)
+    if (!isUserExist) return res.status(401).send('user not found')
 
     const currentDevise = await deviceService.getCurrentDevise(userId, deviceId)
     if (!currentDevise) return res.status(401).send('device not found')
@@ -67,10 +68,6 @@ export const refreshTokenCheck = async (req: Request, res: Response, next: NextF
         res.status(401).send("the last active dates do not match")
         return
     }
-
-
-    req.user = user
     next()
     return
-
 }

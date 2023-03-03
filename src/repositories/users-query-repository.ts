@@ -1,6 +1,6 @@
 import {UserDBType, UserTypeOutput} from "../models/types";
 import {usersRepository} from "./users-repository";
-import {PaginationUserOutputModel} from "../models/models";
+import {PaginationOutputModel} from "../models/models";
 import {UserModel} from "../schemes/schemes";
 import {ObjectId} from "mongodb";
 
@@ -43,7 +43,7 @@ export const usersQueryRepo = {
 
         let pageCount = Math.ceil(usersCount / +pageSize)
 
-        let outputUsers: PaginationUserOutputModel = {
+        let outputUsers: PaginationOutputModel<UserTypeOutput> = {
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,
@@ -51,7 +51,6 @@ export const usersQueryRepo = {
             items: outUsers
         }
         return outputUsers
-
     },
 
     async getUserById(id: string): Promise<UserTypeOutput | null> {
@@ -64,7 +63,8 @@ export const usersQueryRepo = {
         return {
             id: user._id.toString(),
             login: user.login,
-            email: user.email, createdAt: user.createdAt
+            email: user.email,
+            createdAt: user.createdAt
         }
     }
 }

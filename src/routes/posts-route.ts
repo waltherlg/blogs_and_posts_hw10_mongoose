@@ -32,6 +32,7 @@ import {shortDescriptionValidation} from "../middlewares/input-validation-middle
 import {contentValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {existBlogIdValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {postsQueryRepo} from "../repositories/post-query-repository";
+import {jwtService} from "../application/jwt-service";
 
 // GET Returns All posts
 postsRouter.get('/', async (req: RequestWithQuery<RequestPostsQueryModel>, res: Response) => {
@@ -85,11 +86,12 @@ postsRouter.post('/:postId/comments',
             res.sendStatus(404)
             return
         }
+        const token = req.headers.authorization!.split(' ')[1]
+        const userId = await jwtService.getUserIdFromRefreshToken(token)
         const newComment = await commentService.createComment(
             req.params.postId,
             req.body.content,
-            req.user!._id.toString(),
-            req.user!.login)
+            userId)
 
         res.status(201).send(newComment)
     })

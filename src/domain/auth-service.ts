@@ -142,15 +142,15 @@ export const authService = {
     //     return !!isToken
     // },
 
-    async login(user: UserDBType, ip: string, userAgent: string) {
+    async login(userId: ObjectId, ip: string, userAgent: string) {
         const deviceId = new ObjectId()
-        const accessToken = await jwtService.createJWT(user)
-        const refreshToken = await jwtService.createJWTRefresh(user, deviceId)
+        const accessToken = await jwtService.createJWT(userId)
+        const refreshToken = await jwtService.createJWTRefresh(userId, deviceId)
         const lastActiveDate = await jwtService.getLastActiveDateFromRefreshToken(refreshToken)
         const expirationDate = await jwtService.getExpirationDateFromRefreshToken(refreshToken)
         const deviceInfo: UserDeviceDBType = {
             _id: deviceId,
-            userId: user._id,
+            userId: userId,
             ip,
             title: userAgent,
             lastActiveDate,
@@ -160,16 +160,18 @@ export const authService = {
         return { accessToken, refreshToken }
     },
 
-    async logout(userId: ObjectId, refreshToken: string): Promise<boolean>{
+    async logout(refreshToken: string): Promise<boolean>{
+        const userId = await jwtService.getUserIdFromRefreshToken(refreshToken)
         const deviceId = await jwtService.getDeviceIdFromRefreshToken(refreshToken)
         const isDeviceDeleted = await deviceService.deleteUserDeviceById(userId, deviceId)
         return isDeviceDeleted
     },
 
-    async refreshingToken(user: UserDBType, refreshToken: string){
+    async refreshingToken(refreshToken: string){
         const deviceId = await jwtService.getDeviceIdFromRefreshToken(refreshToken)
-        const accessToken = await jwtService.createJWT(user)
-        const newRefreshedToken = await jwtService.createJWTRefresh(user, deviceId)
+        const userId = await jwtService.getUserIdFromRefreshToken(refreshToken)
+        const accessToken = await jwtService.createJWT(userId)
+        const newRefreshedToken = await jwtService.createJWTRefresh(userId, deviceId)
         const lastActiveDate = await jwtService.getLastActiveDateFromRefreshToken(newRefreshedToken)
         const expirationDate = await jwtService.getExpirationDateFromRefreshToken(newRefreshedToken)
         await userDeviceRepo.refreshDeviceInfo(deviceId, lastActiveDate, expirationDate)

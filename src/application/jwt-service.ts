@@ -5,13 +5,13 @@ import {settings} from "../settings";
 
 
 export const jwtService = {
-    async createJWT(user: UserDBType) {
-        const token = jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: '10h'})
+    async createJWT(userId: ObjectId) {
+        const token = jwt.sign({userId: userId}, settings.JWT_SECRET, {expiresIn: '10h'})
         return token
     },
 
-    async createJWTRefresh(user: UserDBType, deviceId: ObjectId)  {
-    const newRefreshedToken = jwt.sign({userId: user._id, deviceId}, settings.JWT_SECRET, {expiresIn: '20h'})
+    async createJWTRefresh(userId: ObjectId, deviceId: ObjectId)  {
+    const newRefreshedToken = jwt.sign({userId, deviceId}, settings.JWT_SECRET, {expiresIn: '20h'})
     return newRefreshedToken
     },
 

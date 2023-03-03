@@ -1,6 +1,6 @@
 
 import {PostDBType, PostTypeOutput} from "../models/types";
-import {PaginationOutputModel, PaginationPostOutputModel} from "../models/models";
+import {PaginationOutputModel} from "../models/models";
 import {sort} from "../application/functions";
 import {skipped} from "../application/functions";
 import {PostModel} from "../schemes/schemes";
@@ -36,7 +36,7 @@ export const postsQueryRepo = {
 
         let pageCount = Math.ceil(+postsCount / +pageSize)
 
-        let outputPosts: PaginationPostOutputModel = {
+        let outputPosts: PaginationOutputModel<PostTypeOutput> = {
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,

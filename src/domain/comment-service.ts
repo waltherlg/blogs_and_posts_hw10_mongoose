@@ -5,17 +5,19 @@ import {jwtService} from "../application/jwt-service";
 import {usersService} from "./users-service";
 import {usersRepository} from "../repositories/users-repository";
 import {commentsQueryRepo} from "../repositories/comments-query-repository";
+import {usersQueryRepo} from "../repositories/users-query-repository";
 
 export const commentService = {
 
-    async createComment(postId: string, content: string, userId: string, userLogin: string): Promise<CommentTypeOutput> {
+    async createComment(postId: string, content: string, userId: string,): Promise<CommentTypeOutput> {
+        const user = await usersQueryRepo.getUserById(userId)
         const newComment: CommentDBType = {
             "_id": new ObjectId(),
             "parentType": "post",
             "parentId": postId,
             "content":	content,
             "userId": userId!,
-            "userLogin": userLogin!,
+            "userLogin": user!.login,
             "createdAt": new Date().toISOString()
         }
         const createdComment = await commentsRepository.createComment(newComment)
