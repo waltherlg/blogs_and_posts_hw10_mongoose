@@ -2,21 +2,9 @@ import {blogsRepository} from "../repositories/blogs-repository";
 import {ObjectId} from "mongodb";
 import {BlogDBType} from "../models/types";
 import {BlogTypeOutput} from "../models/types";
+import {blogsQueryRepo} from "../repositories/blog-query-repository";
 
 export const blogsService = {
-
-    async getBlogByID(id: string): Promise<BlogTypeOutput | null> {
-        return blogsRepository.getBlogByID(id)
-    },
-
-    async getAllBlogsWithoutPagination(): Promise<BlogTypeOutput[]> {
-        return blogsRepository.getAllBlogsWithoutPagination()
-    },
-
-
-    // async getAllBlogs(): Promise<blogTypeOutput[]> {
-    //     return blogsRepository.getAllBlogs()
-    // },
 
     async createBlog(name: string, description: string, websiteUrl: string): Promise<BlogTypeOutput> {
         const newBlog: BlogDBType = {

@@ -1,5 +1,6 @@
 
 import {blogsRepository} from "./blogs-repository";
+import {ObjectId} from "mongodb";
 import {BlogDBType, BlogTypeOutput} from "../models/types";
 import {PaginationOutputModel, RequestBlogsQueryModel} from "../models/models";
 import {BlogModel} from "../schemes/schemes";
@@ -61,6 +62,25 @@ export const blogsQueryRepo = {
             items: outBlogs
         }
         return outputBlogs
+    },
+
+    async getBlogByID(id: string): Promise<BlogTypeOutput | null> {
+        if(!ObjectId.isValid(id)){
+            return null
+        }
+        let _id = new ObjectId(id)
+        const blog: BlogDBType | null = await BlogModel.findOne({_id: _id})
+        if (!blog) {
+            return null
+        }
+        return {
+            id: blog._id.toString(),
+            name: blog.name,
+            description: blog.description,
+            websiteUrl: blog.websiteUrl,
+            createdAt: blog.createdAt,
+            isMembership: blog.isMembership
+        }
     },
 
 

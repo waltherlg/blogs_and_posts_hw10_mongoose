@@ -4,6 +4,7 @@ import {commentsRepository} from "../repositories/comments-repository";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "./users-service";
 import {usersRepository} from "../repositories/users-repository";
+import {commentsQueryRepo} from "../repositories/comments-query-repository";
 
 export const commentService = {
 
@@ -19,10 +20,6 @@ export const commentService = {
         }
         const createdComment = await commentsRepository.createComment(newComment)
         return createdComment
-    },
-
-    async getCommentById(id: string): Promise<CommentTypeOutput | null> {
-        return await commentsRepository.getCommentById(id)
     },
 
     async updateComment(

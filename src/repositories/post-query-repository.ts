@@ -4,6 +4,7 @@ import {PaginationOutputModel, PaginationPostOutputModel} from "../models/models
 import {sort} from "../application/functions";
 import {skipped} from "../application/functions";
 import {PostModel} from "../schemes/schemes";
+import {ObjectId} from "mongodb";
 
 export const postsQueryRepo = {
 
@@ -83,8 +84,27 @@ export const postsQueryRepo = {
             items: outPosts
         }
         return outputPosts
+    },
 
-    }
+    async getPostByID(id: string): Promise<PostTypeOutput | null> {
+        if (!ObjectId.isValid(id)){
+            return null
+        }
+        let _id = new ObjectId(id)
+        const post: any | null = await PostModel.findOne({_id: _id})
+        if (!post) {
+            return null
+        }
+        return {
+            id: post._id.toString(),
+            title: post.title,
+            shortDescription: post.shortDescription,
+            content: post.content,
+            blogId: post.blogId,
+            blogName: post.blogName,
+            createdAt: post.createdAt
+        }
+    },
 
 
 

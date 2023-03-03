@@ -8,55 +8,6 @@ import {PostModel} from "../schemes/schemes";
 //export const postCollection = client.db("blogsAndPosts").collection<postType>("post")
 export const postsRepository = {
 
-    async getPostByID(id: string): Promise<PostTypeOutput | null> {
-        if (!ObjectId.isValid(id)){
-            return null
-        }
-        let _id = new ObjectId(id)
-        const post: any | null = await PostModel.findOne({_id: _id})
-        if (!post) {
-            return null
-        }
-        return {
-            id: post._id.toString(),
-            title: post.title,
-            shortDescription: post.shortDescription,
-            content: post.content,
-            blogId: post.blogId,
-            blogName: post.blogName,
-            createdAt: post.createdAt
-        }
-    },
-
-    async getPostByBlogsID(blogId: string): Promise<PostTypeOutput | null> {
-        const post: any | null = await PostModel.findOne({blogId: blogId})
-        if (!post) {
-            return null
-        }
-        return {
-            id: post._id.toString(),
-            title: post.title,
-            shortDescription: post.shortDescription,
-            content: post.content,
-            blogId: post.blogId,
-            blogName: post.blogName,
-            createdAt: post.createdAt
-        }
-    },
-
-    async getAllPosts(): Promise<PostTypeOutput[]> {
-        let outPosts = await PostModel.find({}).lean()
-        return outPosts.map((posts: any) => ({
-            id: posts._id.toString(),
-            title: posts.title,
-            shortDescription: posts.shortDescription,
-            content: posts.content,
-            blogId: posts.blogId,
-            blogName: posts.blogName,
-            createdAt: posts.createdAt
-        }))
-    },
-
     async createPost(newPost: PostDBType): Promise<PostTypeOutput> {
         const result = await PostModel.insertMany(newPost)
         let createdPost = {

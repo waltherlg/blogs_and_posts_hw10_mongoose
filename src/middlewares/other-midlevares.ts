@@ -3,11 +3,12 @@ import {validationResult} from "express-validator";
 import {commentService} from "../domain/comment-service";
 import {usersService} from "../domain/users-service";
 import {deviceService} from "../domain/device-service";
+import {commentsQueryRepo} from "../repositories/comments-query-repository";
 
 
 export const isUserOwnerOfComments = async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user!.login
-    const comment = await commentService.getCommentById(req.params.commentId)
+    const comment = await commentsQueryRepo.getCommentById(req.params.commentId)
     if (!comment) {
         res.sendStatus(404)
         return

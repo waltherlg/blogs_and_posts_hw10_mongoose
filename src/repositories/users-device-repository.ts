@@ -18,7 +18,6 @@ export const userDeviceRepo = {
                 return foundDevice
             } else return null
         }
-
     },
 
     async getActiveUserDevices(userId: ObjectId){

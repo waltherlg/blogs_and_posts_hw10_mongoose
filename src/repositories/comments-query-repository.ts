@@ -1,8 +1,9 @@
 
 import {sort} from "../application/functions";
 import {skipped} from "../application/functions";
-import {CommentDBType} from "../models/types";
+import {CommentDBType, CommentTypeOutput} from "../models/types";
 import {CommentModel} from "../schemes/schemes";
+import {ObjectId} from "mongodb";
 
 export const commentsQueryRepo = {
 
@@ -42,6 +43,24 @@ export const commentsQueryRepo = {
             items: outComments
         }
         return outputComments
-    }
+    },
+
+    async getCommentById(id: string): Promise<CommentTypeOutput | null> {
+        if(!ObjectId.isValid(id)){
+            return null
+        }
+        let _id = new ObjectId(id)
+        const comment: CommentDBType | null = await CommentModel.findOne({_id: _id})
+        if (!comment) {
+            return null
+        }
+        return {
+            id: comment._id.toString(),
+            content: comment.content,
+            userId: comment.userId,
+            userLogin: comment.userLogin,
+            createdAt: comment.createdAt
+        }
+    },
 }
 

@@ -6,6 +6,7 @@ import {usersService} from "../domain/users-service";
 import {isUserOwnerOfComments} from "../middlewares/other-midlevares";
 import {commentContentValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware/input-validation-middleware";
+import {commentsQueryRepo} from "../repositories/comments-query-repository";
 
 export const commentsRouter = Router({})
 
@@ -13,7 +14,7 @@ export const commentsRouter = Router({})
 //GET return comment by id
 commentsRouter.get('/:id',
     async (req: Request, res: Response) => {
-    let foundComment = await commentService.getCommentById(req.params.id.toString())
+    let foundComment = await commentsQueryRepo.getCommentById(req.params.id.toString())
         if (foundComment) {
             res.status(200).send(foundComment)
         }

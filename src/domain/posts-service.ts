@@ -3,24 +3,18 @@ import {ObjectId} from "mongodb";
 import {PostDBType} from "../models/types";
 import {PostTypeOutput} from "../models/types";
 import {blogsService} from "./blogs-service";
+import {postsQueryRepo} from "../repositories/post-query-repository";
+import {blogsQueryRepo} from "../repositories/blog-query-repository";
 
 
 export const postsService = {
-
-    async getPostByID(id: string): Promise<PostTypeOutput | null> {
-        return await postsRepository.getPostByID(id)
-    },
-
-    async getPostByBlogsID(blogId: string): Promise<PostTypeOutput | null> {
-        return await postsRepository.getPostByBlogsID(blogId)
-    },
 
     async createPost(
         title: string,
         shortDescription: string,
         content: string,
         blogId: string): Promise<PostTypeOutput> {
-        let foundBlog = await blogsService.getBlogByID(blogId)
+        let foundBlog = await blogsQueryRepo.getBlogByID(blogId)
         const blogName = foundBlog!.name
         const newPost: PostDBType = {
             "_id": new ObjectId(),
@@ -40,7 +34,7 @@ export const postsService = {
         shortDescription: string,
         content: string,
         blogId: string): Promise<PostTypeOutput> {
-        let foundBlog = await blogsService.getBlogByID(blogId)
+        let foundBlog = await blogsQueryRepo.getBlogByID(blogId)
         const blogName =  foundBlog!.name
         const newPost: PostDBType = {
             "_id": new ObjectId(),

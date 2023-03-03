@@ -49,17 +49,7 @@ postsRouter.get('/', async (req: RequestWithQuery<RequestPostsQueryModel>, res: 
 
 //GET return post by id
 postsRouter.get('/:postId', async (req: RequestWithParams<URIParamsPostModel>, res) => {
-    let foundPost = await postsService.getPostByID(req.params.postId.toString())
-    if (foundPost) {
-        res.status(200).send(foundPost)
-    } else {
-        res.sendStatus(404)
-    }
-})
-
-//GET return post by blog id
-postsRouter.get('/blogId/:blogId', async (req: RequestWithParams<URIParamsGetPostByBlogIdModel>, res) => {
-    let foundPost = await postsService.getPostByBlogsID(req.params.blogId.toString())
+    let foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
     if (foundPost) {
         res.status(200).send(foundPost)
     } else {
@@ -90,7 +80,7 @@ postsRouter.post('/:postId/comments',
     commentContentValidation,
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<URIParamsCommentModel, CreateCommentModel>, res: Response) => {
-        let foundPost = await postsService.getPostByID(req.params.postId.toString())
+        let foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
         if (!foundPost){
             res.sendStatus(404)
             return
@@ -107,7 +97,7 @@ postsRouter.post('/:postId/comments',
 // GET all comments by post id
 postsRouter.get('/:postId/comments',
     async (req: RequestWithParamsAndQuery<URIParamsPostModel, RequestCommentsByPostIdQueryModel>, res: Response) => {
-        const foundPost = await postsService.getPostByID(req.params.postId.toString())
+        const foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
         if (!foundPost) {
             res.sendStatus(404)
         } else {

@@ -49,11 +49,6 @@ blogsRouter.get('/', async (req: RequestWithQuery<RequestBlogsQueryModel>, res: 
     }
 })
 
-blogsRouter.get('/withoutpaginaion', async (req: Request, res: Response) => {
-    const allBlogs = await blogsService.getAllBlogsWithoutPagination()
-    res.status(200).send(allBlogs)
-})
-
 // POST add blogs
 blogsRouter.post('/',
     basicAuthMiddleware,
@@ -78,7 +73,7 @@ blogsRouter.post('/:blogId/posts',
     contentValidation,
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<URIParamsIDBlogModel, CreatePostModel>, res: Response) => {
-        let foundBlog = await blogsService.getBlogByID(req.params.blogId.toString())
+        let foundBlog = await blogsQueryRepo.getBlogByID(req.params.blogId.toString())
         if(!foundBlog){
             res.sendStatus(404)
         }
@@ -95,7 +90,7 @@ blogsRouter.post('/:blogId/posts',
 
 //GET blog buy id
 blogsRouter.get('/:id', async (req: RequestWithParams<URIParamsBlogModel>, res: Response) => {
-    let foundBlog = await blogsService.getBlogByID(req.params.id.toString())
+    let foundBlog = await blogsQueryRepo.getBlogByID(req.params.id.toString())
     if(foundBlog){
         res.status(200).send(foundBlog)
     }
@@ -106,7 +101,7 @@ blogsRouter.get('/:id', async (req: RequestWithParams<URIParamsBlogModel>, res: 
 
 //GET all posts by blogs id
 blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<URIParamsBlogModel, RequestPostsByBlogsIdQueryModel>, res: Response) => {
-    let foundBlog = await blogsService.getBlogByID(req.params.id.toString()) // check is blog exist
+    let foundBlog = await blogsQueryRepo.getBlogByID(req.params.id.toString()) // check is blog exist
     if(!foundBlog){
         res.sendStatus(404)
     }

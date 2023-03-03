@@ -20,24 +20,6 @@ export const commentsRepository = {
         return createdComment
     },
 
-    async getCommentById(id: string): Promise<CommentTypeOutput | null> {
-        if(!ObjectId.isValid(id)){
-            return null
-        }
-        let _id = new ObjectId(id)
-        const comment: CommentDBType | null = await CommentModel.findOne({_id: _id})
-        if (!comment) {
-            return null
-        }
-        return {
-            id: comment._id.toString(),
-            content: comment.content,
-            userId: comment.userId,
-            userLogin: comment.userLogin,
-            createdAt: comment.createdAt
-        }
-    },
-
     async deleteComment(id: string): Promise<boolean> {
         if (ObjectId.isValid(id)){
             let _id = new ObjectId(id)

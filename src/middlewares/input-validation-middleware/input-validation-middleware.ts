@@ -5,6 +5,7 @@ import {param} from "express-validator";
 import {blogsService} from "../../domain/blogs-service";
 import {usersService} from "../../domain/users-service";
 import {authService} from "../../domain/auth-service";
+import {blogsQueryRepo} from "../../repositories/blog-query-repository";
 
 
 
@@ -150,7 +151,7 @@ export const existBlogIdValidation = body('blogId')
     .isString().bail().withMessage({"message": "blogId is not string", "field": "blogId" })
     .trim().bail().withMessage({message: "wrong blogId", field: "blogId" })
     .custom(async value => {
-        const isBlogIdExist = await blogsService.getBlogByID(value)
+        const isBlogIdExist = await blogsQueryRepo.getBlogByID(value)
         if (!isBlogIdExist) throw new Error
         return true
     }).withMessage({"message": "blogId not exist", "field": "blogId" })
