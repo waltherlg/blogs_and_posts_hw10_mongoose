@@ -86,12 +86,10 @@ postsRouter.post('/:postId/comments',
             res.sendStatus(404)
             return
         }
-        const token = req.headers.authorization!.split(' ')[1]
-        const userId = await jwtService.getUserIdFromRefreshToken(token)
         const newComment = await commentService.createComment(
             req.params.postId,
             req.body.content,
-            userId)
+            req.userId)
 
         res.status(201).send(newComment)
     })

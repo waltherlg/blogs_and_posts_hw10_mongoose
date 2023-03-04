@@ -40,11 +40,11 @@ export const usersService = {
             passwordSalt,
             "email": email,
             "createdAt": new Date().toISOString(),
-            "confirmationCode": "none",
-            "expirationDateOfConfirmationCode": new Date(),
+            "confirmationCode": null,
+            "expirationDateOfConfirmationCode": null,
             "isConfirmed": true,
-            'passwordRecoveryCode': "none",
-            'expirationDateOfRecoveryCode': new Date()
+            'passwordRecoveryCode': null,
+            'expirationDateOfRecoveryCode': null
         }
         const createdUser = await usersRepository.createUser(newUser)
         return createdUser._id.toString()
@@ -53,7 +53,7 @@ export const usersService = {
     async currentUserInfo(userId: string){
         const user = await usersQueryRepo.getUserById(userId)
         if (!user) {
-            return "null"
+            return null
         }
         return {
             email: user.email,

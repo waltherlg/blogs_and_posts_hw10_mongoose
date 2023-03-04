@@ -10,14 +10,14 @@ export const securityRouter = Router({})
 securityRouter.get('/devices',
     refreshTokenCheck,
     async (req: Request, res: Response) => {
-    const usersDevises = await deviceService.getActiveUserDevices(req.user!._id)
+    const usersDevises = await deviceService.getActiveUserDevices(req.userId!)
         res.status(200).send(usersDevises)
 })
 
 securityRouter.delete('/devices',
     refreshTokenCheck,
     async (req: Request, res: Response) => {
-        const isAllUsersDevisesDeleted = await deviceService.deleteAllUserDevicesExceptCurrent(req.user!._id, req.cookies!.refreshToken)
+        const isAllUsersDevisesDeleted = await deviceService.deleteAllUserDevicesExceptCurrent(req.userId, req.deviceId)
         if (isAllUsersDevisesDeleted) return res.sendStatus(204)
         else res.sendStatus(404)
     })
@@ -26,7 +26,7 @@ securityRouter.delete('/devices/:deviceId',
     refreshTokenCheck,
     isUserOwnerOfDevice,
     async (req: RequestWithParams<any>, res: Response) => {
-        const isDeviceDeleted = await deviceService.deleteUserDeviceById(req.user!._id, req.params.deviceId)
+        const isDeviceDeleted = await deviceService.deleteUserDeviceById(req.userId, req.params.deviceId)
         if (isDeviceDeleted) {
             return res.sendStatus(204)
         } else {

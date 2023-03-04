@@ -9,11 +9,23 @@ export const userSchema = new mongoose.Schema<UserDBType>({
     passwordSalt: String,
     email: String,
     createdAt: String,
-    confirmationCode: String,
-    expirationDateOfConfirmationCode: Date,
+    confirmationCode: {
+        type: String,
+        default: null
+    },
+    expirationDateOfConfirmationCode: {
+        type: Date,
+        default: null
+    },
     isConfirmed: Boolean,
-    passwordRecoveryCode: String,
-    expirationDateOfRecoveryCode: Date,
+    passwordRecoveryCode: {
+        type: String,
+        default: null
+    },
+    expirationDateOfRecoveryCode: {
+        type: Date,
+        default: null
+    }
 })
 export const UserModel = mongoose.model('users', userSchema)
 

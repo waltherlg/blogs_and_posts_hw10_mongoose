@@ -145,8 +145,7 @@ blogsRouter.put('/:id',
     websiteUrlValidation,
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<URIParamsBlogModel, UpdateBlogModel>, res) => {
-    const updateBlog = await blogsService
-        .updateBlog(
+    const updateBlog = await blogsService.updateBlog(
             req.params.id,
             req.body.name,
             req.body.description,

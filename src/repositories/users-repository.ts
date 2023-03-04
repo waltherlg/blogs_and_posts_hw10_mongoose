@@ -70,7 +70,7 @@ export const usersRepository = {
     },
 
     async updateConfirmation(_id: ObjectId) {
-        let result = await UserModel.updateOne({_id}, {$set: {isConfirmed: true, confirmationCode: ""} })
+        let result = await UserModel.updateOne({_id}, {$set: {isConfirmed: true, confirmationCode: null, expirationDateOfConfirmationCode: null} })
         return result.modifiedCount === 1
     },
 
@@ -93,7 +93,7 @@ export const usersRepository = {
             {$set:
                     {passwordHash: passwordHash,
                     passwordSalt: passwordSalt,
-                    passwordRecoveryCode: "",
+                    passwordRecoveryCode: null,
                     expirationDateOfRecoveryCode: null
                     }})
         return result.modifiedCount === 1

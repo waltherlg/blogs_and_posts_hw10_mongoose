@@ -88,16 +88,14 @@ authRouter.post('/refresh-token',
 authRouter.get('/me',
     authMiddleware,
     async (req: Request, res: Response) => {
-        const token = req.headers.authorization!.split(' ')[1]
-        const userId = await jwtService.getUserIdFromRefreshToken(token)
-        const currentUserInfo = await usersService.currentUserInfo(userId)
+        const currentUserInfo = await usersService.currentUserInfo(req.userId)
         res.status(200).send(currentUserInfo)
     })
 
 authRouter.post('/logout',
     refreshTokenCheck,
     async (req: Request, res: Response) => {
-        const isLogout = await authService.logout(req.cookies!.refreshToken)
+        const isLogout = await authService.logout(req.userId, req.deviceId)
         if (isLogout) res.cookie("refreshToken", "", {httpOnly: true, secure: true}).sendStatus(204)
         else res.status(404).send("no logout")
     })

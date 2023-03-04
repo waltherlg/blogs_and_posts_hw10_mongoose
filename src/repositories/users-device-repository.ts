@@ -20,36 +20,38 @@ export const userDeviceRepo = {
         }
     },
 
-    async getActiveUserDevices(userId: ObjectId){
-        const activeUserDevices = await UserDeviceModel.find({"userId": userId}).lean()
-
-        return  activeUserDevices.map((device) => ({
+    async getActiveUserDevices(userId: string){
+        if (ObjectId.isValid(userId)){
+            const activeUserDevices = await UserDeviceModel.find({"userId": new ObjectId(userId)}).lean()
+            return  activeUserDevices.map((device) => ({
                 ip: device.ip,
                 title: device.title,
                 lastActiveDate: device.lastActiveDate,
                 deviceId: device._id.toString()
-        }))
+            }))
+        } else return null
+
     },
 
-    async deleteAllUserDevicesExceptCurrent(userId: ObjectId, deviceId: string): Promise<boolean>{
-        if (ObjectId.isValid(deviceId)){
+    async deleteAllUserDevicesExceptCurrent(userId: string, deviceId: string): Promise<boolean>{
+        if (ObjectId.isValid(deviceId && userId)){
             let _id = new ObjectId(deviceId)
-            const result = await UserDeviceModel.deleteMany({$and: [{"userId": userId}, {"_id": {$ne: _id}}]})
+            const result = await UserDeviceModel.deleteMany({$and: [{"userId": new ObjectId(userId)}, {"_id": {$ne: _id}}]})
             return result.acknowledged
         }
         else return false
     },
 
-    async deleteUserDeviceById(userId: ObjectId, deviceId: string): Promise<boolean>{
-        if (ObjectId.isValid(deviceId)){
+    async deleteUserDeviceById(userId: string, deviceId: string): Promise<boolean>{
+        if (ObjectId.isValid(deviceId && userId)){
             let _id = new ObjectId(deviceId)
-            const result = await UserDeviceModel.deleteOne({$and:[{"_id": _id},{"userId": userId}]})
+            const result = await UserDeviceModel.deleteOne({$and:[{"_id": _id},{"userId": new ObjectId(userId)}]})
             return result.deletedCount === 1
         }
         else return false
     },
 
-    async getDeviceByUsersAndDeviceId(userId: ObjectId, deviceId: string){
+    async getDeviceByUsersAndDeviceId(userId: string, deviceId: string){
         if (ObjectId.isValid(userId) && ObjectId.isValid(deviceId)){
             let _id = new ObjectId(deviceId)
             let userIdObj = new ObjectId(userId)

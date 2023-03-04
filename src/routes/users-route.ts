@@ -23,28 +23,37 @@ usersRouter.post('/',
     emailValidation,
     inputValidationMiddleware,
     async (req: RequestWithBody<UserInputModel>, res: Response) => {
-    const newUserId = await usersService.createUser(
-        req.body.login,
-        req.body.password,
-        req.body.email)
-        const newUser = await usersQueryRepo.getUserById(newUserId)
-        if (!newUser){
-            res.sendStatus(500)
+        try {
+            const newUserId = await usersService.createUser(
+                req.body.login,
+                req.body.password,
+                req.body.email)
+            const newUser = await usersQueryRepo.getUserById(newUserId)
+            if (!newUser){
+                res.sendStatus(500)
+            }
+            res.status(201).send(newUser)
         }
-        res.status(201).send(newUser)
-
+        catch (e) {
+            res.status(500).send(e)
+        }
     })
 
 usersRouter.delete('/:id',
     basicAuthMiddleware,
     async (req: RequestWithParams<UserParamURIModel>, res: Response) => {
-    const isUserDeleted = await usersService.deleteUser(req.params.id)
+    try {
+        const isUserDeleted = await usersService.deleteUser(req.params.id)
         if (isUserDeleted) {
             res.sendStatus(204)
         }
         else {
             res.sendStatus(404)
         }
+    }
+    catch (e) {
+        res.status(500).send(e)
+    }
     })
 
 usersRouter.get('/',

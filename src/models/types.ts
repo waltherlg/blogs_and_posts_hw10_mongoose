@@ -46,11 +46,11 @@ export type UserDBType = {
     passwordSalt: string
     email: string
     createdAt: string
-    confirmationCode: string
-    expirationDateOfConfirmationCode: Date,
+    confirmationCode: string | null
+    expirationDateOfConfirmationCode: Date | null
     isConfirmed: boolean,
-    passwordRecoveryCode: string,
-    expirationDateOfRecoveryCode: Date
+    passwordRecoveryCode: string | null
+    expirationDateOfRecoveryCode: Date | null
 }
 export type UserTypeOutput = {
     id: string
