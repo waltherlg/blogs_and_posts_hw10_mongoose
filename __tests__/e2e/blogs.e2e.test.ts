@@ -50,7 +50,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription5',
                         websiteUrl: 'https://www.someweb5.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     },
                     {
                         id: expect.any(String),
@@ -58,7 +59,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription4',
                         websiteUrl: 'https://www.someweb4.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     },
                     {
                         id: expect.any(String),
@@ -66,7 +68,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription3',
                         websiteUrl: 'https://www.someweb3.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     },
                     {
                         id: expect.any(String),
@@ -74,7 +77,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription2',
                         websiteUrl: 'https://www.someweb2.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     }
                 ]
             }
@@ -132,7 +136,8 @@ describe('01 /blogs', () => {
             description: 'newDescription6',
             websiteUrl: 'https://www.someweb6.com',
             createdAt: createdResponse.createdAt,
-            isMembership: true
+            isMembership: false
+
         })
     })
 
@@ -149,7 +154,8 @@ describe('01 /blogs', () => {
             description: 'newDescription6',
             websiteUrl: 'https://www.someweb6.com',
             createdAt: expect.any(String),
-            isMembership: true
+            isMembership: false
+
         })
     })
 
@@ -194,7 +200,8 @@ describe('01 /blogs', () => {
                         description: 'updatedDescription6',
                         websiteUrl: 'https://www.updatedsomeweb6.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     },
                     {
                         id: expect.any(String),
@@ -202,7 +209,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription5',
                         websiteUrl: 'https://www.someweb5.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     },
                     {
                         id: expect.any(String),
@@ -210,7 +218,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription4',
                         websiteUrl: 'https://www.someweb4.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     },
                     {
                         id: expect.any(String),
@@ -218,7 +227,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription3',
                         websiteUrl: 'https://www.someweb3.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     },
                     {
                         id: expect.any(String),
@@ -226,7 +236,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription2',
                         websiteUrl: 'https://www.someweb2.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     }
                 ]
             }
@@ -273,7 +284,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription5',
                         websiteUrl: 'https://www.someweb5.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     },
                     {
                         id: expect.any(String),
@@ -281,7 +293,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription4',
                         websiteUrl: 'https://www.someweb4.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     },
                     {
                         id: expect.any(String),
@@ -289,7 +302,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription3',
                         websiteUrl: 'https://www.someweb3.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     },
                     {
                         id: expect.any(String),
@@ -297,7 +311,8 @@ describe('01 /blogs', () => {
                         description: 'newDescription2',
                         websiteUrl: 'https://www.someweb2.com',
                         createdAt: expect.any(String),
-                        isMembership: true
+                        isMembership: false
+
                     }
                 ]
             }
@@ -527,7 +542,8 @@ describe('01 /blogs', () => {
             description: 'this blog was created for testing posts',
             websiteUrl: 'https://www.blog-for-post.com',
             createdAt: createdResponse.createdAt,
-            isMembership: true
+            isMembership: false
+
         })
 
     })
@@ -991,7 +1007,8 @@ describe('01 /blogs', () => {
             description: 'one more blog for post operation',
             websiteUrl: 'https://www.one-more-blog-for-post.com',
             createdAt: createdResponse.createdAt,
-            isMembership: true
+            isMembership: false
+
         })
     })
 
