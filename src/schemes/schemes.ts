@@ -37,7 +37,7 @@ export const blogSchema = new mongoose.Schema<BlogDBType>({
     createdAt: String,
     isMembership: Boolean
 })
-export const BlogModel = mongoose.model('blogs', blogSchema)
+export const BlogModelClass = mongoose.model('blogs', blogSchema)
 
 export const postSchema = new mongoose.Schema<PostDBType>({
     _id: ObjectId,

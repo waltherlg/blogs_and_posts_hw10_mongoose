@@ -1480,7 +1480,7 @@ describe('01 /blogs', () => {
             .post('/auth/registration')
             .send({login: 'ruslan',
                 password: 'qwerty',
-                email: 'ismailov.it@gmail.com'
+                email: 'ismailovrt.it@gmail.com'
             })
             .expect(204)
 
@@ -1488,18 +1488,50 @@ describe('01 /blogs', () => {
         userIdForTestsRegistration = createdResponse.id
     })
 
-    it('04-00 /auth/registration-confirmation POST = 204 if all is OK', async () => {
+    it('04-00 /auth/registration POST = 204 if all is OK', async () => {
+        await request(app)
+            .post('/auth/registration')
+            .send({login: 'ruslan2',
+                password: 'qwerty',
+                email: 'ismailovrt.it@luft-mail.com'
+            })
+            .expect(204)
+    })
 
-        //const confirmationCode = await testService.getConfirmationCode('ruslan')
-        const user = await UserModel.findOne({_id: new ObjectId(userIdForTestsRegistration)})
+
+
+    it('04-00 /auth/registration-confirmation POST = 204 if all is OK', async () => {
+        setTimeout(async () => {
+        const user = await UserModel.findOne({_id: new ObjectId(userIdForTestsRegistration)}).lean()
         if(!user){
             return null
         }
         const confirmationCode = user.confirmationCode
         await request(app)
             .post('/auth/registration-confirmation')
-            .send({code: confirmationCode})
+            .send({code: confirmationCode!.toString()})
             .expect(204)
+        }, 2000)
+    })
+
+    it('04-00 /auth//registration-email-resending POST = 400 with error message if already confirmed', async () => {
+
+        const createResponse = await request(app)
+            .post('/auth/registration-email-resending')
+            .send({email: 'ismailovrt.it@gmail.com'})
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": "email already confirmed",
+                        "field": "email"
+                    }
+                ]
+        })
     })
 
 
