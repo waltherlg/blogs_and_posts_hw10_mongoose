@@ -26,21 +26,20 @@ authRouter.post('/registration',
     emailValidation,
     inputValidationMiddleware,
     async (req: RequestWithBody<UserInputModel>, res: Response) => {
-    try {
-        const newUserId = await authService.registerUser(
-            req.body.login,
-            req.body.password,
-            req.body.email)
-        if (newUserId) {
-            const user = await usersQueryRepo.getUserById(newUserId)
-            res.status(204).send(user)
+        try {
+            const newUserId = await authService.registerUser(
+                req.body.login,
+                req.body.password,
+                req.body.email)
+            if (newUserId) {
+                const user = await usersQueryRepo.getUserById(newUserId)
+                res.status(204).send(user)
+            } else {
+                res.sendStatus(400)
+            }
+        } catch (error) {
+            res.status(500).send(`controller registration error: ${(error as any).message}`)
         }
-        else {
-            res.sendStatus(400)
-        }
-    } catch (error) {
-        res.status(500).send(`controller registration error: ${(error as any).message}`)
-    }
 
     })
 
@@ -49,17 +48,15 @@ authRouter.post('/registration-email-resending',
     emailResendingValidation,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
-    try {
-        const result = await authService.registrationEmailResending(req.body.email)
-        if (result) {
-            res.sendStatus(204)
+        try {
+            const result = await authService.registrationEmailResending(req.body.email)
+            if (result) {
+                res.sendStatus(204)
+            } else res.sendStatus(400)
+        } catch (error) {
+            res.status(500).send(`controller registration-email-resending error: ${(error as any).message}`)
         }
-        else res.sendStatus(400)
-    }
-    catch (error) {
-        res.status(500).send(`controller registration-email-resending error: ${(error as any).message}`)
-    }
-})
+    })
 
 authRouter.post('/registration-confirmation',
     authRateLimiter.registrationConfirmation,
@@ -70,14 +67,10 @@ authRouter.post('/registration-confirmation',
             const result = await authService.confirmEmail(req.body.code)
             if (result) {
                 res.sendStatus(204)
-            }
-            else res.sendStatus(400)
-        }
-        catch (error) {
+            } else res.sendStatus(400)
+        } catch (error) {
             res.status(500).send(`controller registration-confirmation error: ${(error as any).message}`)
         }
-
-
     })
 
 authRouter.post('/login',
@@ -89,12 +82,9 @@ authRouter.post('/login',
                 const {accessToken, refreshToken} = await authService.login(userId, req.ip, req.headers['user-agent']!)
                 res.status(200).cookie("refreshToken", refreshToken, {httpOnly: true, secure: true}).send({accessToken})
             } else res.sendStatus(401)
-        }
-        catch (error) {
+        } catch (error) {
             res.status(500).send(`controller login error: ${(error as any).message}`)
         }
-
-
     })
 
 authRouter.post('/refresh-token',
@@ -102,12 +92,13 @@ authRouter.post('/refresh-token',
     async (req: Request, res: Response) => {
         try {
             const {accessToken, newRefreshedToken} = await authService.refreshingToken(req.cookies!.refreshToken)
-            res.status(200).cookie("refreshToken", newRefreshedToken, {httpOnly: true, secure: true}).send({accessToken})
-        }
-        catch (error) {
+            res.status(200).cookie("refreshToken", newRefreshedToken, {
+                httpOnly: true,
+                secure: true
+            }).send({accessToken})
+        } catch (error) {
             res.status(500).send(`controller refresh-token error: ${(error as any).message}`)
         }
-
     })
 
 authRouter.get('/me',
@@ -116,11 +107,9 @@ authRouter.get('/me',
         try {
             const currentUserInfo = await usersService.currentUserInfo(req.userId)
             res.status(200).send(currentUserInfo)
-        }
-        catch (error) {
+        } catch (error) {
             res.status(500).send(`controller me error: ${(error as any).message}`)
         }
-
     })
 
 authRouter.post('/logout',
@@ -130,8 +119,7 @@ authRouter.post('/logout',
             const isLogout = await authService.logout(req.userId, req.deviceId)
             if (isLogout) res.cookie("refreshToken", "", {httpOnly: true, secure: true}).sendStatus(204)
             else res.status(404).send("no logout")
-        }
-        catch (error) {
+        } catch (error) {
             res.status(500).send(`controller logout error: ${(error as any).message}`)
         }
     })
@@ -146,14 +134,12 @@ authRouter.post('/password-recovery',
             const result = await authService.passwordRecovery(req.body.email);
             if (result) {
                 res.sendStatus(204)
-            }
-            else res.sendStatus(404)
-        }
-        catch (error) {
+            } else res.sendStatus(404)
+        } catch (error) {
             res.status(500).send(`controller password-recovery error: ${(error as any).message}`)
         }
 
-})
+    })
 
 authRouter.post('/new-password',
     authRateLimiter.newPassword,
@@ -165,10 +151,8 @@ authRouter.post('/new-password',
             const result = await authService.newPasswordSet(req.body.newPassword, req.body.recoveryCode);
             if (result) {
                 res.sendStatus(204)
-            }
-            else res.sendStatus(400)
-        }
-        catch (error) {
+            } else res.sendStatus(400)
+        } catch (error) {
             res.status(500).send(`controller new-password error: ${(error as any).message}`)
         }
 
