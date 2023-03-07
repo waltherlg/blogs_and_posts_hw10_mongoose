@@ -14,29 +14,33 @@ export const commentsRouter = Router({})
 //GET return comment by id
 commentsRouter.get('/:id',
     async (req: Request, res: Response) => {
-    let foundComment = await commentsQueryRepo.getCommentById(req.params.id.toString())
-        if (foundComment) {
-            res.status(200).send(foundComment)
+        try {
+            let foundComment = await commentsQueryRepo.getCommentById(req.params.id.toString())
+            if (foundComment) {
+                res.status(200).send(foundComment)
+            } else {
+                res.sendStatus(404)
+            }
+        } catch (error) {
+            res.status(500).send(`controller get comment by id error: ${(error as any).message}`)
         }
-        else {
-            res.sendStatus(404)
-        }
-    }
-)
+    })
 
 commentsRouter.delete('/:commentId',
     authMiddleware,
     isUserOwnerOfComments,
     async (req: Request, res: Response) => {
-        let isDeleted = await commentService.deleteComment(req.params.commentId.toString())
-        if (isDeleted) {
-            res.sendStatus(204)
+        try {
+            let isDeleted = await commentService.deleteComment(req.params.commentId.toString())
+            if (isDeleted) {
+                res.sendStatus(204)
+            } else {
+                res.sendStatus(404)
+            }
+        } catch (error) {
+            res.status(500).send(`controller delete comment by id error: ${(error as any).message}`)
         }
-        else {
-            res.sendStatus(404)
-        }
-    }
-)
+    })
 
 commentsRouter.put('/:commentId',
     authMiddleware,
@@ -44,15 +48,17 @@ commentsRouter.put('/:commentId',
     commentContentValidation,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
-        let updateComment = await commentService.updateComment(
-            req.params.commentId.toString(),
-            req.body.content)
+        try {
+            let updateComment = await commentService.updateComment(
+                req.params.commentId.toString(),
+                req.body.content)
 
-        if (updateComment) {
-            res.sendStatus(204)
+            if (updateComment) {
+                res.sendStatus(204)
+            } else {
+                res.sendStatus(404)
+            }
+        } catch (error) {
+            res.status(500).send(`controller update comment by id error: ${(error as any).message}`)
         }
-        else {
-            res.sendStatus(404)
-        }
-    }
-)
+    })
