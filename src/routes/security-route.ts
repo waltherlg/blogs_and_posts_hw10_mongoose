@@ -10,27 +10,39 @@ export const securityRouter = Router({})
 securityRouter.get('/devices',
     refreshTokenCheck,
     async (req: Request, res: Response) => {
-    const usersDevises = await deviceService.getActiveUserDevices(req.userId!)
-        res.status(200).send(usersDevises)
-})
+        try {
+            const usersDevises = await deviceService.getActiveUserDevices(req.userId!)
+            res.status(200).send(usersDevises)
+        } catch (error) {
+            res.status(500).send(`controller security get devices error: ${(error as any).message}`)
+        }
+    })
 
 securityRouter.delete('/devices',
     refreshTokenCheck,
     async (req: Request, res: Response) => {
-        const isAllUsersDevisesDeleted = await deviceService.deleteAllUserDevicesExceptCurrent(req.userId, req.deviceId)
-        if (isAllUsersDevisesDeleted) return res.sendStatus(204)
-        else res.sendStatus(404)
+        try {
+            const isAllUsersDevisesDeleted = await deviceService.deleteAllUserDevicesExceptCurrent(req.userId, req.deviceId)
+            if (isAllUsersDevisesDeleted) return res.sendStatus(204)
+            else res.sendStatus(404)
+        } catch (error) {
+            res.status(500).send(`controller security delete devices error: ${(error as any).message}`)
+        }
     })
 
 securityRouter.delete('/devices/:deviceId',
     refreshTokenCheck,
     isUserOwnerOfDevice,
     async (req: RequestWithParams<any>, res: Response) => {
-        const isDeviceDeleted = await deviceService.deleteUserDeviceById(req.userId, req.params.deviceId)
-        if (isDeviceDeleted) {
-            return res.sendStatus(204)
-        } else {
-            res.status(404).send("some error")
+        try {
+            const isDeviceDeleted = await deviceService.deleteUserDeviceById(req.userId, req.params.deviceId)
+            if (isDeviceDeleted) {
+                return res.sendStatus(204)
+            } else {
+                res.status(404).send("some error")
+            }
+        } catch (error) {
+            res.status(500).send(`controller security delete device by id error: ${(error as any).message}`)
         }
     })
 
