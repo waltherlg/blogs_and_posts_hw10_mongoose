@@ -49,55 +49,91 @@ authRouter.post('/registration-email-resending',
     emailResendingValidation,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
+    try {
         const result = await authService.registrationEmailResending(req.body.email)
         if (result) {
             res.sendStatus(204)
         }
         else res.sendStatus(400)
-    })
+    }
+    catch (error) {
+        res.status(500).send(`controller registration-email-resending error: ${(error as any).message}`)
+    }
+})
 
 authRouter.post('/registration-confirmation',
     authRateLimiter.registrationConfirmation,
     confirmationCodeValidation,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
-    const result = await authService.confirmEmail(req.body.code)
-        if (result) {
-            res.sendStatus(204)
+        try {
+            const result = await authService.confirmEmail(req.body.code)
+            if (result) {
+                res.sendStatus(204)
+            }
+            else res.sendStatus(400)
         }
-        else res.sendStatus(400)
+        catch (error) {
+            res.status(500).send(`controller registration-confirmation error: ${(error as any).message}`)
+        }
+
+
     })
 
 authRouter.post('/login',
     authRateLimiter.login,
     async (req: RequestWithBody<UserAuthModel>, res: Response) => {
-        const userId = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
-        if (userId) {
-            const {accessToken, refreshToken} = await authService.login(userId, req.ip, req.headers['user-agent']!)
-            res.status(200).cookie("refreshToken", refreshToken, {httpOnly: true, secure: true}).send({accessToken})
-        } else res.sendStatus(401)
+        try {
+            const userId = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
+            if (userId) {
+                const {accessToken, refreshToken} = await authService.login(userId, req.ip, req.headers['user-agent']!)
+                res.status(200).cookie("refreshToken", refreshToken, {httpOnly: true, secure: true}).send({accessToken})
+            } else res.sendStatus(401)
+        }
+        catch (error) {
+            res.status(500).send(`controller login error: ${(error as any).message}`)
+        }
+
+
     })
 
 authRouter.post('/refresh-token',
     refreshTokenCheck,
     async (req: Request, res: Response) => {
-        const {accessToken, newRefreshedToken} = await authService.refreshingToken(req.cookies!.refreshToken)
-        res.status(200).cookie("refreshToken", newRefreshedToken, {httpOnly: true, secure: true}).send({accessToken})
+        try {
+            const {accessToken, newRefreshedToken} = await authService.refreshingToken(req.cookies!.refreshToken)
+            res.status(200).cookie("refreshToken", newRefreshedToken, {httpOnly: true, secure: true}).send({accessToken})
+        }
+        catch (error) {
+            res.status(500).send(`controller refresh-token error: ${(error as any).message}`)
+        }
+
     })
 
 authRouter.get('/me',
     authMiddleware,
     async (req: Request, res: Response) => {
-        const currentUserInfo = await usersService.currentUserInfo(req.userId)
-        res.status(200).send(currentUserInfo)
+        try {
+            const currentUserInfo = await usersService.currentUserInfo(req.userId)
+            res.status(200).send(currentUserInfo)
+        }
+        catch (error) {
+            res.status(500).send(`controller me error: ${(error as any).message}`)
+        }
+
     })
 
 authRouter.post('/logout',
     refreshTokenCheck,
     async (req: Request, res: Response) => {
-        const isLogout = await authService.logout(req.userId, req.deviceId)
-        if (isLogout) res.cookie("refreshToken", "", {httpOnly: true, secure: true}).sendStatus(204)
-        else res.status(404).send("no logout")
+        try {
+            const isLogout = await authService.logout(req.userId, req.deviceId)
+            if (isLogout) res.cookie("refreshToken", "", {httpOnly: true, secure: true}).sendStatus(204)
+            else res.status(404).send("no logout")
+        }
+        catch (error) {
+            res.status(500).send(`controller logout error: ${(error as any).message}`)
+        }
     })
 
 authRouter.post('/password-recovery',
@@ -106,11 +142,17 @@ authRouter.post('/password-recovery',
     inputValidationMiddleware,
     isEmailExistValidation,
     async (req: Request, res: Response) => {
-    const result = await authService.passwordRecovery(req.body.email);
-    if (result) {
-        res.sendStatus(204)
-    }
-    else res.sendStatus(404)
+        try {
+            const result = await authService.passwordRecovery(req.body.email);
+            if (result) {
+                res.sendStatus(204)
+            }
+            else res.sendStatus(404)
+        }
+        catch (error) {
+            res.status(500).send(`controller password-recovery error: ${(error as any).message}`)
+        }
+
 })
 
 authRouter.post('/new-password',
@@ -119,10 +161,16 @@ authRouter.post('/new-password',
     passwordRecoveryCodeValidation,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
-        const result = await authService.newPasswordSet(req.body.newPassword, req.body.recoveryCode);
-        if (result) {
-            res.sendStatus(204)
+        try {
+            const result = await authService.newPasswordSet(req.body.newPassword, req.body.recoveryCode);
+            if (result) {
+                res.sendStatus(204)
+            }
+            else res.sendStatus(400)
         }
-        else res.sendStatus(400)
+        catch (error) {
+            res.status(500).send(`controller new-password error: ${(error as any).message}`)
+        }
+
     })
 

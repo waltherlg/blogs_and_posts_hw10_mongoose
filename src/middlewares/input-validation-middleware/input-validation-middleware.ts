@@ -59,7 +59,7 @@ export const emailValidation = body('email')
     .custom(async value => {
         const isEmailExist = await usersService.isEmailExist(value)
         if (isEmailExist) throw new Error
-    }).bail().withMessage({"message": "email already exist", "field": "email" })
+    }).bail().withMessage({"message": "email already using", "field": "email" })
 
 export const emailValidationForRecovery = body('email')
     .exists({checkFalsy: true, checkNull: true}).bail().withMessage({"message": "write your email", "field": "email" })

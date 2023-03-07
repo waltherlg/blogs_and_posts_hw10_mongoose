@@ -1,10 +1,11 @@
-import {Request, Response, Router} from "express";
+import {Response, Router} from "express";
 
 import {postsService} from "../domain/posts-service";
 import {commentService} from "../domain/comment-service";
 import {commentsQueryRepo} from "../repositories/comments-query-repository";
 
 import {
+    PostTypeOutput,
     RequestWithBody,
     RequestWithParams,
     RequestWithParamsAndBody,
@@ -13,26 +14,25 @@ import {
 } from "../models/types";
 import {
     CreateCommentModel,
-    CreatePostModel, RequestCommentsByPostIdQueryModel,
+    CreatePostModel,
+    RequestCommentsByPostIdQueryModel,
     RequestPostsQueryModel,
-    UpdatePostModel, URIParamsCommentModel,
-    URIParamsGetPostByBlogIdModel,
+    UpdatePostModel,
+    URIParamsCommentModel,
     URIParamsPostModel
 } from "../models/models";
-
-export const postsRouter = Router({})
-
 import {
     commentContentValidation,
-    inputValidationMiddleware
+    contentValidation,
+    existBlogIdValidation,
+    inputValidationMiddleware,
+    shortDescriptionValidation,
+    titleValidation
 } from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {authMiddleware, basicAuthMiddleware} from "../middlewares/basic-auth.middleware";
-import {titleValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
-import {shortDescriptionValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
-import {contentValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
-import {existBlogIdValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {postsQueryRepo} from "../repositories/post-query-repository";
-import {jwtService} from "../application/jwt-service";
+
+export const postsRouter = Router({})
 
 // GET Returns All posts
 postsRouter.get('/', async (req: RequestWithQuery<RequestPostsQueryModel>, res: Response) => {
@@ -66,13 +66,18 @@ postsRouter.post('/',
     contentValidation,
     existBlogIdValidation,
     inputValidationMiddleware,
-    async (req: RequestWithBody<CreatePostModel>, res: Response) => {
-        const newPost = await postsService.createPost(
+    async (req: RequestWithBody<CreatePostModel>, res: Response<PostTypeOutput>) => {
+    try {
+        const newPostResult = await postsService.createPost(
             req.body.title,
             req.body.shortDescription,
             req.body.content,
             req.body.blogId)
-        res.status(201).send(newPost)
+        res.status(201).send(newPostResult)
+    } catch (error) {
+            res.sendStatus(500)
+    }
+
     })
 
 // POST add comment by post id

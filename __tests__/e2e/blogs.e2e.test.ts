@@ -8,6 +8,7 @@ import {postsService} from "../../src/domain/posts-service";
 import {ObjectId} from "mongodb";
 import {usersQueryRepo} from "../../src/repositories/users-query-repository";
 import {UserModel} from "../../src/schemes/schemes";
+import {UserTypeOutput} from "../../src/models/types";
 
 
 const basicAuthRight = Buffer.from('admin:qwerty').toString('base64');
@@ -1473,22 +1474,19 @@ describe('01 /blogs', () => {
         })
     })
 
-    let userIdForTestsRegistration: string
+    let userEmailForTestsRegistration = 'ismailovrt.it@gmail.com'
 
     it('04-00 /auth/registration POST = 204 and return new created user if all is OK', async () => {
-        const createResponse = await request(app)
+        await request(app)
             .post('/auth/registration')
             .send({login: 'ruslan',
                 password: 'qwerty',
-                email: 'ismailovrt.it@gmail.com'
+                email: userEmailForTestsRegistration
             })
             .expect(204)
-
-        const createdResponse = createResponse.body
-        userIdForTestsRegistration = createdResponse.id
     })
 
-    it('04-00 /auth/registration POST = 204 if all is OK', async () => {
+    it('04-01 /auth/registration POST = 204 if all is OK', async () => {
         await request(app)
             .post('/auth/registration')
             .send({login: 'ruslan2',
@@ -1499,22 +1497,17 @@ describe('01 /blogs', () => {
     })
 
 
-
-    it('04-00 /auth/registration-confirmation POST = 204 if all is OK', async () => {
-        setTimeout(async () => {
-        const user = await UserModel.findOne({_id: new ObjectId(userIdForTestsRegistration)}).lean()
-        if(!user){
-            return null
-        }
-        const confirmationCode = user.confirmationCode
+    it('04-02 /auth/registration-confirmation POST = 204 if all is OK', async () => {
+        const user = await UserModel.findOne({email: userEmailForTestsRegistration}).lean()
+            expect(user).not.toBeNull()
+        const confirmationCode = user!.confirmationCode
         await request(app)
             .post('/auth/registration-confirmation')
-            .send({code: confirmationCode!.toString()})
+            .send({code: confirmationCode})
             .expect(204)
-        }, 2000)
     })
 
-    it('04-00 /auth//registration-email-resending POST = 400 with error message if already confirmed', async () => {
+    it('04-03 /auth//registration-email-resending POST = 400 with error message if already confirmed', async () => {
 
         const createResponse = await request(app)
             .post('/auth/registration-email-resending')
@@ -1533,6 +1526,50 @@ describe('01 /blogs', () => {
                 ]
         })
     })
+
+    it('04-04 /auth/registration-confirmation POST = 400 with error message if code not exist', async () => {
+        const createResponse = await request(app)
+            .post('/auth/registration-confirmation')
+            .send({code: "111111111"})
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": "confirmation code not exist",
+                        "field": "code"
+                    }
+                ]
+            })
+    })
+
+    it('04-00 /auth/registration POST = 400 with error message if email already using', async () => {
+        const createResponse = await request(app)
+            .post('/auth/registration')
+            .send({login: 'ruslan34',
+                password: 'qwerty',
+                email: userEmailForTestsRegistration
+            })
+            .expect(400)
+
+        const createdResponse = createResponse.body
+
+        expect(createdResponse).toEqual(
+            {
+                "errorsMessages": [
+                    {
+                        "message": "email already using",
+                        "field": "email"
+                    }
+                ]
+            })
+    })
+
+
+
 
 
 

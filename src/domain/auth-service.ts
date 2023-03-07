@@ -144,7 +144,7 @@ export const authService = {
 
     async login(userId: ObjectId, ip: string, userAgent: string) {
         const deviceId = new ObjectId()
-        const accessToken = await jwtService.createJWT(userId)
+        const accessToken = jwtService.createJWT(userId)
         const refreshToken = await jwtService.createJWTRefresh(userId, deviceId)
         const lastActiveDate = await jwtService.getLastActiveDateFromRefreshToken(refreshToken)
         const expirationDate = await jwtService.getExpirationDateFromRefreshToken(refreshToken)
@@ -159,16 +159,16 @@ export const authService = {
         await userDeviceRepo.addDeviceInfo(deviceInfo)
         return { accessToken, refreshToken }
     },
-
+//
     async logout(userId: string, deviceId: string): Promise<boolean>{
         const isDeviceDeleted = await deviceService.deleteUserDeviceById(userId, deviceId)
         return isDeviceDeleted
     },
 
     async refreshingToken(refreshToken: string){
-        const deviceId = await jwtService.getDeviceIdFromRefreshToken(refreshToken)
-        const userId = await jwtService.getUserIdFromRefreshToken(refreshToken)
-        const accessToken = await jwtService.createJWT(userId)
+        const deviceId = jwtService.getDeviceIdFromRefreshToken(refreshToken)
+        const userId = jwtService.getUserIdFromRefreshToken(refreshToken)
+        const accessToken = jwtService.createJWT(userId)
         const newRefreshedToken = await jwtService.createJWTRefresh(userId, deviceId)
         const lastActiveDate = await jwtService.getLastActiveDateFromRefreshToken(newRefreshedToken)
         const expirationDate = await jwtService.getExpirationDateFromRefreshToken(newRefreshedToken)

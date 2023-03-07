@@ -6,7 +6,6 @@ import {blogsService} from "./blogs-service";
 import {postsQueryRepo} from "../repositories/post-query-repository";
 import {blogsQueryRepo} from "../repositories/blog-query-repository";
 
-
 export const postsService = {
 
     async createPost(
