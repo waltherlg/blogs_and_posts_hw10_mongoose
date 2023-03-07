@@ -43,18 +43,22 @@ postsRouter.get('/', async (req: RequestWithQuery<RequestPostsQueryModel>, res: 
         let pageSize = req.query.pageSize ? req.query.pageSize : '10'
         const allPosts = await postsQueryRepo.getAllPosts(sortBy, sortDirection, pageNumber, pageSize)
         res.status(200).send(allPosts);
-    } catch (e) {
-        res.status(500).send(e)
+    } catch (error) {
+        res.status(500).send(`controller get all posts error: ${(error as any).message}`)
     }
 })
 
 //GET return post by id
 postsRouter.get('/:postId', async (req: RequestWithParams<URIParamsPostModel>, res) => {
-    let foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
-    if (foundPost) {
-        res.status(200).send(foundPost)
-    } else {
-        res.sendStatus(404)
+    try {
+        let foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
+        if (foundPost) {
+            res.status(200).send(foundPost)
+        } else {
+            res.sendStatus(404)
+        }
+    } catch (error) {
+        res.status(500).send(`controller get post by id error: ${(error as any).message}`)
     }
 })
 
@@ -86,17 +90,20 @@ postsRouter.post('/:postId/comments',
     commentContentValidation,
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<URIParamsCommentModel, CreateCommentModel>, res: Response) => {
-        let foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
-        if (!foundPost){
-            res.sendStatus(404)
-            return
+        try {
+            let foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
+            if (!foundPost) {
+                res.sendStatus(404)
+                return
+            }
+            const newComment = await commentService.createComment(
+                req.params.postId,
+                req.body.content,
+                req.userId)
+            res.status(201).send(newComment)
+        } catch (error) {
+            res.status(500).send(`controller create comment by post id error: ${(error as any).message}`)
         }
-        const newComment = await commentService.createComment(
-            req.params.postId,
-            req.body.content,
-            req.userId)
-
-        res.status(201).send(newComment)
     })
 
 // GET all comments by post id
@@ -131,16 +138,20 @@ postsRouter.put('/:postId',
     contentValidation,
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<URIParamsPostModel, UpdatePostModel>, res: Response) => {
-        const updatePost = await postsService.updatePost(
-            req.params.postId,
-            req.body.title,
-            req.body.shortDescription,
-            req.body.content,
-            req.body.blogId)
-        if (updatePost) {
-            res.sendStatus(204)
-        } else {
-            res.sendStatus(404)
+        try {
+            const updatePost = await postsService.updatePost(
+                req.params.postId,
+                req.body.title,
+                req.body.shortDescription,
+                req.body.content,
+                req.body.blogId)
+            if (updatePost) {
+                res.sendStatus(204)
+            } else {
+                res.sendStatus(404)
+            }
+        } catch (error) {
+            res.status(500).send(`controller update post by id error: ${(error as any).message}`)
         }
     })
 
@@ -148,11 +159,15 @@ postsRouter.put('/:postId',
 postsRouter.delete('/:postId',
     basicAuthMiddleware,
     async (req: RequestWithParams<URIParamsPostModel>, res: Response) => {
-        const isDeleted = await postsService.deletePost(req.params.postId)
-        if (isDeleted) {
-            return res.sendStatus(204)
-        } else {
-            res.sendStatus(404);
+        try {
+            const isDeleted = await postsService.deletePost(req.params.postId)
+            if (isDeleted) {
+                return res.sendStatus(204)
+            } else {
+                res.sendStatus(404);
+            }
+        } catch (error) {
+            res.status(500).send(`controller delete post by id error: ${(error as any).message}`)
         }
     })
 
