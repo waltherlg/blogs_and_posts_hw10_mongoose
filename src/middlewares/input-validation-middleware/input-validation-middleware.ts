@@ -156,7 +156,15 @@ export const existBlogIdValidation = body('blogId')
         return true
     }).withMessage({"message": "blogId not exist", "field": "blogId" })
 
-
+export const likeStatusValidation = body('likeStatus')
+    .exists().bail().withMessage({message: "is not a string", field: "likeStatus" })
+    .isString().bail().withMessage({"message": "blogId is not string", "field": "likeStatus" })
+    .trim().bail().withMessage({message: "wrong blogId", field: "likeStatus" })
+    .custom(async value => {
+        const isBlogIdExist = await blogsQueryRepo.getBlogByID(value)
+        if (!isBlogIdExist) throw new Error
+        return true
+    }).withMessage({"message": "blogId not exist", "field": "likeStatus" })
 
 export const commentContentValidation = body('content')
     .exists().bail().withMessage({message: "content not exist", field: "content" })

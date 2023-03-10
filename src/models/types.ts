@@ -68,13 +68,21 @@ export type CommentDBType = {
     userLogin:	string
     createdAt:	string
 }
-
+type CommentatorInfoType = {
+    userId:	string
+    userLogin:	string
+}
+type LikesInfoType = {
+    likesCount: number,
+    dislikesCount: number,
+    myStatus: any
+}
 export type CommentTypeOutput = {
     id:	string
     content: string
-    userId:	string
-    userLogin:	string
+    commentatorInfo: CommentatorInfoType
     createdAt:	string
+    LikesInfo: LikesInfoType
 }
 
 export type UserDeviceDBType = {

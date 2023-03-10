@@ -57,9 +57,16 @@ export const commentsQueryRepo = {
         return {
             id: comment._id.toString(),
             content: comment.content,
-            userId: comment.userId,
-            userLogin: comment.userLogin,
-            createdAt: comment.createdAt
+            commentatorInfo: {
+                userId: comment.userId,
+                userLogin: comment.userLogin,
+            },
+            createdAt: comment.createdAt,
+            LikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: 0
+            }
         }
     },
 }

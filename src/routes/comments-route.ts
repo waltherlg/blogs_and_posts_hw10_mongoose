@@ -56,3 +56,20 @@ commentsRouter.put('/:commentId',
         }
     }
 )
+
+commentsRouter.put('/:commentId/like-status',
+    authMiddleware,
+    inputValidationMiddleware,
+    async (req: Request, res: Response) => {
+        let updateComment = await commentService.updateComment(
+            req.params.commentId.toString(),
+            req.body.content)
+
+        if (updateComment) {
+            res.sendStatus(204)
+        }
+        else {
+            res.sendStatus(404)
+        }
+    }
+)
