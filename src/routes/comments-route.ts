@@ -1,12 +1,14 @@
 import {Request, Response, Router} from "express";
 import {commentsRepository} from "../repositories/comments-repository";
 import {commentService} from "../domain/comment-service";
+import {likeService} from "../domain/like-service";
 import {authMiddleware} from "../middlewares/basic-auth.middleware";
 import {usersService} from "../domain/users-service";
 import {isUserOwnerOfComments} from "../middlewares/other-midlevares";
 import {commentContentValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {commentsQueryRepo} from "../repositories/comments-query-repository";
+import {jwtService} from "../application/jwt-service";
 
 export const commentsRouter = Router({})
 
@@ -42,6 +44,7 @@ commentsRouter.delete('/:commentId',
         }
     })
 
+
 commentsRouter.put('/:commentId',
     authMiddleware,
     isUserOwnerOfComments,
@@ -62,3 +65,28 @@ commentsRouter.put('/:commentId',
             res.status(500).send(`controller update comment by id error: ${(error as any).message}`)
         }
     })
+
+commentsRouter.put('/:commentId/like-status',
+    authMiddleware,
+    inputValidationMiddleware,
+    async (req: Request, res: Response) => {
+    try {
+        const token = req.headers.authorization!.split(' ')[1]
+        const userId = await jwtService.getUserIdFromRefreshToken(token)
+        let updateCommentLike = await likeService.updateCommentLike(
+            userId,
+            req.params.commentId.toString(),
+            req.body.likeStatus)
+
+        if (updateCommentLike) {
+            res.sendStatus(204)
+        }
+        else {
+            res.sendStatus(404)
+        }
+    }
+    catch (error) {
+        res.status(500).send(`controller comment like status error: ${(error as any).message}`)
+    }
+    }
+)

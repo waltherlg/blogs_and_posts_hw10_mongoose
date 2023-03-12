@@ -25,7 +25,10 @@ export const userSchema = new mongoose.Schema<UserDBType>({
     expirationDateOfRecoveryCode: {
         type: Date,
         default: null
-    }
+    },
+    likedComments: [],
+    likedPosts: []
+
 })
 export const UserModel = mongoose.model('users', userSchema)
 

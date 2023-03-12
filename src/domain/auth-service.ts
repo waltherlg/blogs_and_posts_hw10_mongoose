@@ -48,7 +48,9 @@ export const authService = {
             }),
             "isConfirmed": false,
             'passwordRecoveryCode': null,
-            'expirationDateOfRecoveryCode': null
+            'expirationDateOfRecoveryCode': null,
+            'likedComments': [],
+            'likedPosts': []
         }
         const createdUser = await usersRepository.createUser(newUser)
 
