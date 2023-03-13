@@ -39,6 +39,18 @@ export type BlogDBType = {
     isMembership: boolean
 }
 
+type commentsLikeType = {
+    commentsId: string
+    createdAt: Date
+    status: string
+}
+
+type postsLikeType = {
+    postsId: string
+    createdAt: Date
+    status: string
+}
+
 export type UserDBType = {
     _id: ObjectId
     login: string
@@ -46,11 +58,13 @@ export type UserDBType = {
     passwordSalt: string
     email: string
     createdAt: string
-    confirmationCode: string
-    expirationDateOfConfirmationCode: Date,
+    confirmationCode: string | null
+    expirationDateOfConfirmationCode: Date | null
     isConfirmed: boolean,
-    passwordRecoveryCode: string,
-    expirationDateOfRecoveryCode: Date
+    passwordRecoveryCode: string | null
+    expirationDateOfRecoveryCode: Date | null
+    likedComments: Array<commentsLikeType>
+    likedPosts: Array<postsLikeType>
 }
 export type UserTypeOutput = {
     id: string

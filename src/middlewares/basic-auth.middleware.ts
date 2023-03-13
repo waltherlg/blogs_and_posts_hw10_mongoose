@@ -34,7 +34,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
     const userId = await jwtService.getUserIdFromRefreshToken(token)
     if (userId) {
-        //req.user = await usersService.getUserById(userId)
+        req.userId = userId
         next()
         return
     }
@@ -68,6 +68,8 @@ export const refreshTokenCheck = async (req: Request, res: Response, next: NextF
         res.status(401).send("the last active dates do not match")
         return
     }
+    req.userId = userId
+    req.deviceId = deviceId
     next()
     return
 }

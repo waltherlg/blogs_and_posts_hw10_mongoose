@@ -6,17 +6,17 @@ import {blogsQueryRepo} from "../repositories/blog-query-repository";
 
 export const blogsService = {
 
-    async createBlog(name: string, description: string, websiteUrl: string): Promise<BlogTypeOutput> {
+    async createBlog(name: string, description: string, websiteUrl: string): Promise<string> {
         const newBlog: BlogDBType = {
             "_id": new ObjectId(),
             "name": name,
             "description": description,
             "websiteUrl": websiteUrl,
             "createdAt": new Date().toISOString(),
-            "isMembership": true
+            "isMembership": false
         }
-        const createdBlog = await blogsRepository.createBlog(newBlog)
-        return createdBlog
+        const createdBlogsId = await blogsRepository.createBlog(newBlog)
+        return createdBlogsId
     },
 
     async updateBlog(id: string, name: string, description: string, websiteUrl: string): Promise<boolean>{

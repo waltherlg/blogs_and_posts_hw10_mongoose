@@ -1,10 +1,11 @@
-import {Request, Response, Router} from "express";
+import {Response, Router} from "express";
 
 import {postsService} from "../domain/posts-service";
 import {commentService} from "../domain/comment-service";
 import {commentsQueryRepo} from "../repositories/comments-query-repository";
 
 import {
+    PostTypeOutput,
     RequestWithBody,
     RequestWithParams,
     RequestWithParamsAndBody,
@@ -13,26 +14,25 @@ import {
 } from "../models/types";
 import {
     CreateCommentModel,
-    CreatePostModel, RequestCommentsByPostIdQueryModel,
+    CreatePostModel,
+    RequestCommentsByPostIdQueryModel,
     RequestPostsQueryModel,
-    UpdatePostModel, URIParamsCommentModel,
-    URIParamsGetPostByBlogIdModel,
+    UpdatePostModel,
+    URIParamsCommentModel,
     URIParamsPostModel
 } from "../models/models";
-
-export const postsRouter = Router({})
-
 import {
     commentContentValidation,
-    inputValidationMiddleware
+    contentValidation,
+    existBlogIdValidation,
+    inputValidationMiddleware,
+    shortDescriptionValidation,
+    titleValidation
 } from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {authMiddleware, basicAuthMiddleware} from "../middlewares/basic-auth.middleware";
-import {titleValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
-import {shortDescriptionValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
-import {contentValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
-import {existBlogIdValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {postsQueryRepo} from "../repositories/post-query-repository";
-import {jwtService} from "../application/jwt-service";
+
+export const postsRouter = Router({})
 
 // GET Returns All posts
 postsRouter.get('/', async (req: RequestWithQuery<RequestPostsQueryModel>, res: Response) => {
@@ -43,18 +43,22 @@ postsRouter.get('/', async (req: RequestWithQuery<RequestPostsQueryModel>, res: 
         let pageSize = req.query.pageSize ? req.query.pageSize : '10'
         const allPosts = await postsQueryRepo.getAllPosts(sortBy, sortDirection, pageNumber, pageSize)
         res.status(200).send(allPosts);
-    } catch (e) {
-        res.status(500).send(e)
+    } catch (error) {
+        res.status(500).send(`controller get all posts error: ${(error as any).message}`)
     }
 })
 
 //GET return post by id
 postsRouter.get('/:postId', async (req: RequestWithParams<URIParamsPostModel>, res) => {
-    let foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
-    if (foundPost) {
-        res.status(200).send(foundPost)
-    } else {
-        res.sendStatus(404)
+    try {
+        let foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
+        if (foundPost) {
+            res.status(200).send(foundPost)
+        } else {
+            res.sendStatus(404)
+        }
+    } catch (error) {
+        res.status(500).send(`controller get post by id error: ${(error as any).message}`)
     }
 })
 
@@ -66,13 +70,18 @@ postsRouter.post('/',
     contentValidation,
     existBlogIdValidation,
     inputValidationMiddleware,
-    async (req: RequestWithBody<CreatePostModel>, res: Response) => {
-        const newPost = await postsService.createPost(
+    async (req: RequestWithBody<CreatePostModel>, res: Response<PostTypeOutput>) => {
+    try {
+        const newPostResult = await postsService.createPost(
             req.body.title,
             req.body.shortDescription,
             req.body.content,
             req.body.blogId)
-        res.status(201).send(newPost)
+        res.status(201).send(newPostResult)
+    } catch (error) {
+            res.sendStatus(500)
+    }
+
     })
 
 // POST add comment by post id
@@ -81,19 +90,20 @@ postsRouter.post('/:postId/comments',
     commentContentValidation,
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<URIParamsCommentModel, CreateCommentModel>, res: Response) => {
-        let foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
-        if (!foundPost){
-            res.sendStatus(404)
-            return
+        try {
+            let foundPost = await postsQueryRepo.getPostByID(req.params.postId.toString())
+            if (!foundPost) {
+                res.sendStatus(404)
+                return
+            }
+            const newComment = await commentService.createComment(
+                req.params.postId,
+                req.body.content,
+                req.userId)
+            res.status(201).send(newComment)
+        } catch (error) {
+            res.status(500).send(`controller create comment by post id error: ${(error as any).message}`)
         }
-        const token = req.headers.authorization!.split(' ')[1]
-        const userId = await jwtService.getUserIdFromRefreshToken(token)
-        const newComment = await commentService.createComment(
-            req.params.postId,
-            req.body.content,
-            userId)
-
-        res.status(201).send(newComment)
     })
 
 // GET all comments by post id
@@ -128,16 +138,20 @@ postsRouter.put('/:postId',
     contentValidation,
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<URIParamsPostModel, UpdatePostModel>, res: Response) => {
-        const updatePost = await postsService.updatePost(
-            req.params.postId,
-            req.body.title,
-            req.body.shortDescription,
-            req.body.content,
-            req.body.blogId)
-        if (updatePost) {
-            res.sendStatus(204)
-        } else {
-            res.sendStatus(404)
+        try {
+            const updatePost = await postsService.updatePost(
+                req.params.postId,
+                req.body.title,
+                req.body.shortDescription,
+                req.body.content,
+                req.body.blogId)
+            if (updatePost) {
+                res.sendStatus(204)
+            } else {
+                res.sendStatus(404)
+            }
+        } catch (error) {
+            res.status(500).send(`controller update post by id error: ${(error as any).message}`)
         }
     })
 
@@ -145,11 +159,15 @@ postsRouter.put('/:postId',
 postsRouter.delete('/:postId',
     basicAuthMiddleware,
     async (req: RequestWithParams<URIParamsPostModel>, res: Response) => {
-        const isDeleted = await postsService.deletePost(req.params.postId)
-        if (isDeleted) {
-            return res.sendStatus(204)
-        } else {
-            res.sendStatus(404);
+        try {
+            const isDeleted = await postsService.deletePost(req.params.postId)
+            if (isDeleted) {
+                return res.sendStatus(204)
+            } else {
+                res.sendStatus(404);
+            }
+        } catch (error) {
+            res.status(500).send(`controller delete post by id error: ${(error as any).message}`)
         }
     })
 

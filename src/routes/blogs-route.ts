@@ -57,11 +57,18 @@ blogsRouter.post('/',
     websiteUrlValidation,
     inputValidationMiddleware,
     async (req: RequestWithBody<CreateBlogModel>, res: Response) => {
-        const newBlog = await blogsService.createBlog(
+    try {
+        const newBlogsId = await blogsService.createBlog(
             req.body.name,
             req.body.description,
             req.body.websiteUrl)
+        const newBlog = await blogsQueryRepo.getBlogByID(newBlogsId)
         res.status(201).send(newBlog)
+    }
+    catch (error){
+        res.status(500).send(error)
+    }
+
     })
 
 // POST create post for specific blog
@@ -73,39 +80,44 @@ blogsRouter.post('/:blogId/posts',
     contentValidation,
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<URIParamsIDBlogModel, CreatePostModel>, res: Response) => {
-        let foundBlog = await blogsQueryRepo.getBlogByID(req.params.blogId.toString())
-        if(!foundBlog){
-            res.sendStatus(404)
+        try {
+            let foundBlog = await blogsQueryRepo.getBlogByID(req.params.blogId)
+            if (!foundBlog) {
+                res.sendStatus(404)
+            } else {
+                const newPost = await postsService.createPostByBlogId(
+                    req.body.title,
+                    req.body.shortDescription,
+                    req.body.content,
+                    req.params.blogId.toString())
+                res.status(201).send(newPost)
+            }
+        } catch (error) {
+            res.status(500).send(`controller :blogId/post error: ${(error as any).message}`)
         }
-        else {
-            const newPost = await postsService.createPostByBlogId(
-                req.body.title,
-                req.body.shortDescription,
-                req.body.content,
-                req.params.blogId.toString())
-            res.status(201).send(newPost)
-        }
-
-})
+    })
 
 //GET blog buy id
 blogsRouter.get('/:id', async (req: RequestWithParams<URIParamsBlogModel>, res: Response) => {
-    let foundBlog = await blogsQueryRepo.getBlogByID(req.params.id.toString())
-    if(foundBlog){
-        res.status(200).send(foundBlog)
+    try {
+        let foundBlog = await blogsQueryRepo.getBlogByID(req.params.id.toString())
+        if (foundBlog) {
+            res.status(200).send(foundBlog)
+        } else {
+            res.sendStatus(404)
+        }
+    } catch (error) {
+        res.status(500).send(`controller get blog by id error: ${(error as any).message}`)
     }
-    else {
-        res.sendStatus(404)
-    }
+
 })
 
 //GET all posts by blogs id
 blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<URIParamsBlogModel, RequestPostsByBlogsIdQueryModel>, res: Response) => {
     let foundBlog = await blogsQueryRepo.getBlogByID(req.params.id.toString()) // check is blog exist
-    if(!foundBlog){
+    if (!foundBlog) {
         res.sendStatus(404)
-    }
-    else {
+    } else {
         try {
             let blogId = req.params.id.toString()
             let sortBy = req.query.sortBy ? req.query.sortBy : 'createdAt'
@@ -113,11 +125,10 @@ blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<URIParamsBlo
             let pageNumber = req.query.pageNumber ? req.query.pageNumber : '1'
             let pageSize = req.query.pageSize ? req.query.pageSize : '10'
             let foundPosts = await postsQueryRepo.getAllPostsByBlogsID(blogId, sortBy, sortDirection, pageNumber, pageSize)
-            if(foundPosts) {
+            if (foundPosts) {
                 res.status(200).send(foundPosts)
             }
-        }
-        catch (error){
+        } catch (error) {
             res.status(500).send(error)
         }
     }
@@ -129,11 +140,15 @@ blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<URIParamsBlo
 blogsRouter.delete('/:id',
     basicAuthMiddleware,
     async (req: RequestWithParams<URIParamsBlogModel>, res) => {
-        const isDeleted = await blogsService.deleteBlog(req.params.id)
-        if (isDeleted) {
-            res.sendStatus(204)
-        } else {
-            res.sendStatus(404);
+        try {
+            const isDeleted = await blogsService.deleteBlog(req.params.id)
+            if (isDeleted) {
+                res.sendStatus(204)
+            } else {
+                res.sendStatus(404);
+            }
+        } catch (error) {
+            res.status(500).send(`controller delete blog by id error: ${(error as any).message}`)
         }
     })
 
@@ -145,20 +160,20 @@ blogsRouter.put('/:id',
     websiteUrlValidation,
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<URIParamsBlogModel, UpdateBlogModel>, res) => {
-    const updateBlog = await blogsService
-        .updateBlog(
-            req.params.id,
-            req.body.name,
-            req.body.description,
-            req.body.websiteUrl)
-        if (updateBlog){
-            res.sendStatus(204)
+        try {
+            const updateBlog = await blogsService.updateBlog(
+                req.params.id,
+                req.body.name,
+                req.body.description,
+                req.body.websiteUrl)
+            if (updateBlog) {
+                res.sendStatus(204)
+            } else {
+                res.sendStatus(404)
+            }
+        } catch (error) {
+            res.status(500).send(`controller update blog by id error: ${(error as any).message}`)
         }
-        else {
-            res.sendStatus(404)
-        }
-
-
     })
 
 

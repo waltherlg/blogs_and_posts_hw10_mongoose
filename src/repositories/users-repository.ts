@@ -11,15 +11,14 @@ import {HydratedDocument} from "mongoose";
 export const usersRepository = {
     async createUser(userDto: UserDBType): Promise<HydratedDocument<UserDBType>> {
         const newUser = new UserModel(userDto)
-
         await newUser.save()
         //const result = await UserModel.insertMany(newUser)
-        let createdUser = {
-            id: newUser._id.toString(),
-            login: newUser.login,
-            email: newUser.email,
-            createdAt: newUser.createdAt
-        }
+        // let createdUser = {
+        //     id: newUser._id.toString(),
+        //     login: newUser.login,
+        //     email: newUser.email,
+        //     createdAt: newUser.createdAt
+        // }
         return newUser
     },
 
@@ -42,7 +41,7 @@ export const usersRepository = {
             return null
         }
         let _id = new ObjectId(id)
-        const user: UserDBType | null = await UserModel.findOne({_id: _id})
+        const user: UserDBType | null = await UserModel.findOne({_id: _id}).lean()
         if (!user){
             return null
         }
@@ -50,14 +49,14 @@ export const usersRepository = {
     },
 
     async getUserByConfirmationCode(code: string): Promise<UserDBType | null> {
-        const user: UserDBType | null = await UserModel.findOne({confirmationCode: code})
+        const user: UserDBType | null = await UserModel.findOne({confirmationCode: code}).lean()
         if (!user){
             return null
         }
         return user
     },
     async getUserByPasswordRecoveryCode(code: string){
-        const user = await UserModel.findOne({passwordRecoveryCode: code})
+        const user = await UserModel.findOne({passwordRecoveryCode: code}).lean()
         if (!user){
             return null
         }
@@ -65,12 +64,12 @@ export const usersRepository = {
     },
 
     async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserDBType | null>{
-        const user: UserDBType | null = await UserModel.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
+        const user: UserDBType | null = await UserModel.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]}).lean()
         return user
     },
 
-    async updateConfirmation(_id: ObjectId) {
-        let result = await UserModel.updateOne({_id}, {$set: {isConfirmed: true, confirmationCode: ""} })
+    async updateConfirmation(code: string) {
+        let result = await UserModel.updateOne({code}, {$set: {isConfirmed: true, confirmationCode: null, expirationDateOfConfirmationCode: null} })
         return result.modifiedCount === 1
     },
 
@@ -93,7 +92,7 @@ export const usersRepository = {
             {$set:
                     {passwordHash: passwordHash,
                     passwordSalt: passwordSalt,
-                    passwordRecoveryCode: "",
+                    passwordRecoveryCode: null,
                     expirationDateOfRecoveryCode: null
                     }})
         return result.modifiedCount === 1

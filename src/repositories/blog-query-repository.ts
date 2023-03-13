@@ -3,7 +3,7 @@ import {blogsRepository} from "./blogs-repository";
 import {ObjectId} from "mongodb";
 import {BlogDBType, BlogTypeOutput} from "../models/types";
 import {PaginationOutputModel, RequestBlogsQueryModel} from "../models/models";
-import {BlogModel} from "../schemes/schemes";
+import {BlogModelClass} from "../schemes/schemes";
 
 function sort(sortDirection: string){
     return (sortDirection === 'desc') ? -1 : 1;
@@ -23,18 +23,18 @@ export const blogsQueryRepo = {
         pageNumber: string,
         pageSize: string,) {
 
-        let blogsCount = await BlogModel.countDocuments({name: new RegExp(searchNameTerm, "gi")})
+        let blogsCount = await BlogModelClass.countDocuments({name: new RegExp(searchNameTerm, "gi")})
 
         let blogs
         if (searchNameTerm !== 'null'){
-            blogs = await BlogModel.find({name: new RegExp(searchNameTerm, "gi")})
+            blogs = await BlogModelClass.find({name: new RegExp(searchNameTerm, "gi")})
                 .skip(skipped(pageNumber, pageSize))
                 .limit(+pageSize)
                 .sort({[sortBy]: sort(sortDirection)})
                 .lean()
         }
         else {
-            blogs = await BlogModel.find({})
+            blogs = await BlogModelClass.find({})
                 .skip(skipped(pageNumber, pageSize))
                 .limit(+pageSize)
                 .sort({[sortBy]: sort(sortDirection)})
@@ -69,7 +69,7 @@ export const blogsQueryRepo = {
             return null
         }
         let _id = new ObjectId(id)
-        const blog: BlogDBType | null = await BlogModel.findOne({_id: _id})
+        const blog: BlogDBType | null = await BlogModelClass.findOne({_id: _id}).lean()
         if (!blog) {
             return null
         }

@@ -6,7 +6,30 @@ import {blogsService} from "./blogs-service";
 import {postsQueryRepo} from "../repositories/post-query-repository";
 import {blogsQueryRepo} from "../repositories/blog-query-repository";
 
-
+// class Post {
+//     _id: ObjectId
+//     title: string
+//     shortDescription: string
+//     content: string
+//     blogId: string
+//     blogName: string
+//     createdAt: string
+//
+//
+//
+//     constructor(title: string, shortDescription: string, content: string, blogId: string) {
+//         let foundBlog = await blogsQueryRepo.getBlogByID(blogId)
+//         const blogName = foundBlog!.name
+//         this._id = new ObjectId()
+//         this.title = title,
+//         this.shortDescription = shortDescription,
+//         this.content = content,
+//         this.blogId = blogId,
+//         this.blogName = blogName,
+//         this.createdAt =  new Date().toISOString()
+//
+//     }
+// }
 export const postsService = {
 
     async createPost(

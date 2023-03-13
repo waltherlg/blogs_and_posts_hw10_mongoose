@@ -22,7 +22,5 @@ testingRouter.delete('/all-data',
         } else {
             res.sendStatus(404);
         }
-
-
     })
 

@@ -3,28 +3,62 @@ import {UserDBType, UserTypeOutput} from "../models/types";
 import {usersRepository} from "../repositories/users-repository";
 import * as bcrypt from 'bcrypt'
 import {usersQueryRepo} from "../repositories/users-query-repository";
+import {UserModel} from "../schemes/schemes";
+import {bcryptService} from "../application/bcrypt-service";
 
-const getUserDto = (login: string,
-                    password: string,
-                    email: string,
-                    isConfirmed: boolean,
-                    passwordHash: string,
-                    passwordSalt: string): UserDBType => {
-    return {
-        _id: new ObjectId(),
-        "login": login,
-        passwordHash,
-        passwordSalt,
-        "email": email,
-        "createdAt": new Date().toISOString(),
-        "confirmationCode": "none",
-        "expirationDateOfConfirmationCode": new Date(),
-        "isConfirmed": true,
-        'passwordRecoveryCode': "none",
-        'expirationDateOfRecoveryCode': new Date()
-    }
 
-}
+// const getUserDto = (login: string,
+//                     password: string,
+//                     email: string,
+//                     isConfirmed: boolean,
+//                     passwordHash: string,
+//                     passwordSalt: string): UserDBType => {
+//     return {
+//         _id: new ObjectId(),
+//         "login": login,
+//         passwordHash,
+//         passwordSalt,
+//         "email": email,
+//         "createdAt": new Date().toISOString(),
+//         "confirmationCode": "none",
+//         "expirationDateOfConfirmationCode": new Date(),
+//         "isConfirmed": true,
+//         'passwordRecoveryCode': "none",
+//         'expirationDateOfRecoveryCode': new Date()
+//     }
+//}
+
+// export class UserClass {
+//     _id: ObjectId
+//     login: string
+//     passwordHash: string
+//     passwordSalt: string
+//     email: string
+//     createdAt: string
+//     confirmationCode: string | null
+//     expirationDateOfConfirmationCode: Date | null
+//     isConfirmed: boolean
+//     passwordRecoveryCode: string | null
+//     expirationDateOfRecoveryCode: Date | null
+//     likedComments: Array<string>
+//     likedPosts: Array<string>
+//     constructor (login: string, password: string, email: string) {
+//         this._id = new ObjectId()
+//         this.login = login
+//         const {passwordHash, passwordSalt} = await bcryptService.createHashAndSalt(password);
+//         this.passwordHash = passwordHash
+//         this.passwordSalt = passwordSalt
+//         this.email = email
+//         this.createdAt = new Date().toISOString(),
+//         this.confirmationCode = null
+//         this.expirationDateOfConfirmationCode = null
+//         this.isConfirmed = true
+//         this.passwordRecoveryCode = null
+//         this.expirationDateOfRecoveryCode = null
+//         this.likedComments = []
+//         this.likedPosts = []
+//     }
+// }
 
 export const usersService = {
 
@@ -40,11 +74,13 @@ export const usersService = {
             passwordSalt,
             "email": email,
             "createdAt": new Date().toISOString(),
-            "confirmationCode": "none",
-            "expirationDateOfConfirmationCode": new Date(),
+            "confirmationCode": null,
+            "expirationDateOfConfirmationCode": null,
             "isConfirmed": true,
-            'passwordRecoveryCode': "none",
-            'expirationDateOfRecoveryCode': new Date()
+            'passwordRecoveryCode': null,
+            'expirationDateOfRecoveryCode': null,
+            'likedComments': [],
+            'likedPosts': []
         }
         const createdUser = await usersRepository.createUser(newUser)
         return createdUser._id.toString()
@@ -53,7 +89,7 @@ export const usersService = {
     async currentUserInfo(userId: string){
         const user = await usersQueryRepo.getUserById(userId)
         if (!user) {
-            return "null"
+            return null
         }
         return {
             email: user.email,

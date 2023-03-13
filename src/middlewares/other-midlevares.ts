@@ -8,8 +8,7 @@ import {jwtService} from "../application/jwt-service";
 
 
 export const isUserOwnerOfComments = async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization!.split(' ')[1]
-    const userId = await jwtService.getUserIdFromRefreshToken(token)
+    const userId = req.userId
     const comment = await commentsQueryRepo.getCommentById(req.params.commentId)
     if (!comment) {
         res.sendStatus(404)
@@ -29,9 +28,7 @@ export const isUserOwnerOfDevice = async (req: Request, res: Response, next: Nex
         res.status(404).send("device not found")
         return
     }
-    const token = req.headers.authorization!.split(' ')[1]
-    const userId = await jwtService.getUserIdFromRefreshToken(token)
-    const isOwner = await deviceService.doesUserHaveThisDevice(userId, deviceId)
+    const isOwner = await deviceService.doesUserHaveThisDevice(req.userId, deviceId)
     if (!isOwner) {
         res.sendStatus(403)
         return

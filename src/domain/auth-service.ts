@@ -47,8 +47,10 @@ export const authService = {
                 //minutes: 3
             }),
             "isConfirmed": false,
-            'passwordRecoveryCode': "",
-            'expirationDateOfRecoveryCode': new Date()
+            'passwordRecoveryCode': null,
+            'expirationDateOfRecoveryCode': null,
+            'likedComments': [],
+            'likedPosts': []
         }
         const createdUser = await usersRepository.createUser(newUser)
 
@@ -62,11 +64,11 @@ export const authService = {
         return createdUser._id.toString()
     },
 
-    async confirmEmail(code: string){
+    async confirmEmail(code: string): Promise<boolean>{
         let user = await usersRepository.getUserByConfirmationCode(code)
         if (!user) return false
-        if (user.expirationDateOfConfirmationCode > new Date()){
-            let result = await usersRepository.updateConfirmation(user._id)
+        if (user.expirationDateOfConfirmationCode! > new Date()){
+            let result = await usersRepository.updateConfirmation(code)
             return result
         }
         return false
@@ -118,7 +120,7 @@ export const authService = {
     async newPasswordSet(newPassword: string, recoveryCode: string){
         let user = await usersRepository.getUserByPasswordRecoveryCode(recoveryCode)
         if (!user) return false
-        if (user.expirationDateOfRecoveryCode > new Date()){
+        if (user.expirationDateOfRecoveryCode! > new Date()){
             const passwordSalt = await bcrypt.genSalt(10)
             const passwordHash = await this._generateHash(newPassword, passwordSalt)
             let result = await usersRepository.newPasswordSet(user._id, passwordSalt, passwordHash)
@@ -144,7 +146,7 @@ export const authService = {
 
     async login(userId: ObjectId, ip: string, userAgent: string) {
         const deviceId = new ObjectId()
-        const accessToken = await jwtService.createJWT(userId)
+        const accessToken = jwtService.createJWT(userId)
         const refreshToken = await jwtService.createJWTRefresh(userId, deviceId)
         const lastActiveDate = await jwtService.getLastActiveDateFromRefreshToken(refreshToken)
         const expirationDate = await jwtService.getExpirationDateFromRefreshToken(refreshToken)
@@ -159,18 +161,16 @@ export const authService = {
         await userDeviceRepo.addDeviceInfo(deviceInfo)
         return { accessToken, refreshToken }
     },
-
-    async logout(refreshToken: string): Promise<boolean>{
-        const userId = await jwtService.getUserIdFromRefreshToken(refreshToken)
-        const deviceId = await jwtService.getDeviceIdFromRefreshToken(refreshToken)
+//
+    async logout(userId: string, deviceId: string): Promise<boolean>{
         const isDeviceDeleted = await deviceService.deleteUserDeviceById(userId, deviceId)
         return isDeviceDeleted
     },
 
     async refreshingToken(refreshToken: string){
-        const deviceId = await jwtService.getDeviceIdFromRefreshToken(refreshToken)
-        const userId = await jwtService.getUserIdFromRefreshToken(refreshToken)
-        const accessToken = await jwtService.createJWT(userId)
+        const deviceId = jwtService.getDeviceIdFromRefreshToken(refreshToken)
+        const userId = jwtService.getUserIdFromRefreshToken(refreshToken)
+        const accessToken = jwtService.createJWT(userId)
         const newRefreshedToken = await jwtService.createJWTRefresh(userId, deviceId)
         const lastActiveDate = await jwtService.getLastActiveDateFromRefreshToken(newRefreshedToken)
         const expirationDate = await jwtService.getExpirationDateFromRefreshToken(newRefreshedToken)
