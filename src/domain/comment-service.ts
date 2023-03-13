@@ -19,11 +19,11 @@ export const commentService = {
             "userId": userId!,
             "userLogin": user!.login,
             "createdAt": new Date().toISOString(),
-            'likesCount': 0,
+            "likesCount": 0,
             'dislikesCount': 0
         }
-        const createdComment = await commentsRepository.createComment(newComment)
-        return createdComment
+        const createdCommentId = await commentsRepository.createComment(newComment)
+        return createdCommentId
     },
 
     async updateComment(

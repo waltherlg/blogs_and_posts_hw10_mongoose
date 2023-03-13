@@ -6,6 +6,7 @@ import {blogsService} from "../../domain/blogs-service";
 import {usersService} from "../../domain/users-service";
 import {authService} from "../../domain/auth-service";
 import {blogsQueryRepo} from "../../repositories/blog-query-repository";
+import {commentsQueryRepo} from "../../repositories/comments-query-repository";
 
 
 
@@ -161,7 +162,7 @@ export const likeStatusValidation = body('likeStatus')
     .isString().bail().withMessage({"message": "blogId is not string", "field": "likeStatus" })
     .trim().bail().withMessage({message: "wrong blogId", field: "likeStatus" })
     .custom(async value => {
-        const isBlogIdExist = await blogsQueryRepo.getBlogByID(value)
+        const isCommentExist = await commentsQueryRepo.getс(value)
         if (!isBlogIdExist) throw new Error
         return true
     }).withMessage({"message": "blogId not exist", "field": "likeStatus" })

@@ -98,7 +98,18 @@ export const usersRepository = {
         return result.modifiedCount === 1
     },
 
-    async addLike(userId: string, commentId: string, likeStatus: string){
+    async addLike(userId: string, commentsId: string,  createdAt: Date, status: string){
+        if (!ObjectId.isValid(userId)){
+            return null
+        }
+        let _id = new ObjectId(userId)
+        let user = await UserModel.findById({_id})
+        if(!user) return null
+        const newLikedComment = {commentsId, createdAt, status, }
+        user.likedComments.push(newLikedComment)
+        await user.save();
+
+
         let result = await UserModel.updateOne()
     }
 

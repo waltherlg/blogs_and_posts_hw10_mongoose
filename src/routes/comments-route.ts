@@ -5,7 +5,10 @@ import {likeService} from "../domain/like-service";
 import {authMiddleware} from "../middlewares/basic-auth.middleware";
 import {usersService} from "../domain/users-service";
 import {isUserOwnerOfComments} from "../middlewares/other-midlevares";
-import {commentContentValidation} from "../middlewares/input-validation-middleware/input-validation-middleware";
+import {
+    commentContentValidation,
+    likeStatusValidation
+} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware/input-validation-middleware";
 import {commentsQueryRepo} from "../repositories/comments-query-repository";
 import {jwtService} from "../application/jwt-service";
@@ -66,8 +69,9 @@ commentsRouter.put('/:commentId',
         }
     })
 
-commentsRouter.put('/:commentId/like-status',
+commentsRouter.put('/:commentsId/like-status',
     authMiddleware,
+    likeStatusValidation,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
     try {
@@ -75,8 +79,9 @@ commentsRouter.put('/:commentId/like-status',
         const userId = await jwtService.getUserIdFromRefreshToken(token)
         let updateCommentLike = await likeService.updateCommentLike(
             userId,
-            req.params.commentId.toString(),
+            req.params.commentsId.toString(),
             req.body.likeStatus)
+        res.sendStatus(201)
 
         // if (updateCommentLike) {
         //     res.sendStatus(204)

@@ -61,6 +61,8 @@ export const commentSchema = new mongoose.Schema<CommentDBType>({
     userId:	String,
     userLogin:	String,
     createdAt:	String,
+    likesCount: Number,
+    dislikesCount: Number
 })
 export const CommentModel = mongoose.model('comments', commentSchema)
 
