@@ -96,6 +96,10 @@ export const usersRepository = {
                     expirationDateOfRecoveryCode: null
                     }})
         return result.modifiedCount === 1
+    },
+
+    async addLike(userId: string, commentId: string, likeStatus: string){
+        let result = await UserModel.updateOne()
     }
 
 

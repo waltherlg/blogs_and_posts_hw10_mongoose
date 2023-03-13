@@ -14,7 +14,7 @@ export const isUserOwnerOfComments = async (req: Request, res: Response, next: N
         res.sendStatus(404)
         return
     }
-    if (userId !== comment.userId){
+    if (userId !== comment.commentatorInfo.userId){
         res.sendStatus(403)
         return
     }

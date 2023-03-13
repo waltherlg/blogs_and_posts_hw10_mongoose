@@ -9,7 +9,7 @@ import {usersQueryRepo} from "../repositories/users-query-repository";
 
 export const commentService = {
 
-    async createComment(postId: string, content: string, userId: string,): Promise<CommentTypeOutput> {
+    async createComment(postId: string, content: string, userId: string,): Promise<string> {
         const user = await usersQueryRepo.getUserById(userId)
         const newComment: CommentDBType = {
             "_id": new ObjectId(),
@@ -18,7 +18,9 @@ export const commentService = {
             "content":	content,
             "userId": userId!,
             "userLogin": user!.login,
-            "createdAt": new Date().toISOString()
+            "createdAt": new Date().toISOString(),
+            'likesCount': 0,
+            'dislikesCount': 0
         }
         const createdComment = await commentsRepository.createComment(newComment)
         return createdComment

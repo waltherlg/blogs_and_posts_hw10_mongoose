@@ -8,16 +8,9 @@ import {CommentModel} from "../schemes/schemes";
 
 export const commentsRepository = {
 
-    async createComment(newComment: CommentDBType): Promise<CommentTypeOutput> {
+    async createComment(newComment: CommentDBType): Promise<string> {
         const result = await CommentModel.insertMany(newComment)
-        let createdComment = {
-            id: newComment._id.toString(),
-            content: newComment.content,
-            userId: newComment.userId,
-            userLogin: newComment.userLogin,
-            createdAt: newComment.createdAt,
-        }
-        return createdComment
+        return newComment._id.toString()
     },
 
     async deleteComment(id: string): Promise<boolean> {

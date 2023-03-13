@@ -66,5 +66,15 @@ export const usersQueryRepo = {
             email: user.email,
             createdAt: user.createdAt
         }
+    },
+
+    async isCommentLikeExist(userId: string, commentId: string): Promise<boolean> {
+        if(!ObjectId.isValid(userId)){
+            return false
+        }
+        let _id = new ObjectId(userId)
+        const isExist = UserModel.findOne({$and: [{_id: _id}, {commentId: commentId}]})
+        return !!isExist
     }
+
 }

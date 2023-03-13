@@ -78,12 +78,12 @@ commentsRouter.put('/:commentId/like-status',
             req.params.commentId.toString(),
             req.body.likeStatus)
 
-        if (updateCommentLike) {
-            res.sendStatus(204)
-        }
-        else {
-            res.sendStatus(404)
-        }
+        // if (updateCommentLike) {
+        //     res.sendStatus(204)
+        // }
+        // else {
+        //     res.sendStatus(404)
+        // }
     }
     catch (error) {
         res.status(500).send(`controller comment like status error: ${(error as any).message}`)

@@ -81,6 +81,9 @@ export type CommentDBType = {
     userId:	string
     userLogin:	string
     createdAt:	string
+    likesCount: number
+    dislikesCount: number
+
 }
 type CommentatorInfoType = {
     userId:	string
