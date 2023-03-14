@@ -100,7 +100,7 @@ export const usersRepository = {
 
     async addLike(userId: string, commentsId: string,  createdAt: Date, status: string){
         if (!ObjectId.isValid(userId)){
-            return null
+            return false
         }
         let _id = new ObjectId(userId)
         let user = await UserModel.findById({_id})
@@ -108,9 +108,7 @@ export const usersRepository = {
         const newLikedComment = {commentsId, createdAt, status, }
         user.likedComments.push(newLikedComment)
         await user.save();
-
-
-        let result = await UserModel.updateOne()
+        return true
     }
 
 
