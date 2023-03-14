@@ -32,6 +32,23 @@ export const commentsRepository = {
         else return false
     },
 
+    async setCountCommentsLike(commentsId: string, status: string) {
+        if (ObjectId.isValid(commentsId)) {
+            return false
+        }
+        let _id = new ObjectId(commentsId)
+        let comment = await CommentModel.findOne({_id: _id})
+        if (!comment) return false
+        if (status === 'like') {
+            comment.likesCount += 1
+        }
+        if (status === 'dislike') {
+            comment.dislikesCount =+ 1
+        }
+        await comment.save()
+        return true
+    },
+
     async deleteAllComments(): Promise<boolean>{
         const result = await CommentModel.deleteMany({})
         return result.acknowledged

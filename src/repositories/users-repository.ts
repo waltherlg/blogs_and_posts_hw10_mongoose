@@ -98,7 +98,7 @@ export const usersRepository = {
         return result.modifiedCount === 1
     },
 
-    async addLike(userId: string, commentsId: string,  createdAt: Date, status: string){
+    async createLikeObject(userId: string, commentsId: string, createdAt: Date, status: string){
         if (!ObjectId.isValid(userId)){
             return false
         }

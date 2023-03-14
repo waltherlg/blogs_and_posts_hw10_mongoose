@@ -4,10 +4,10 @@ import {usersRepository} from "../repositories/users-repository";
 
 export const likeService = {
     async updateCommentLike(userId: string, commentsId: string, status: string){
-        const isLikeExist = await usersQueryRepo.isCommentLikeExist(userId, commentsId)
-        if (!isLikeExist){
+        const isUserAlreadyLikeComment = await usersQueryRepo.isUserAlreadyLikeComment(userId, commentsId)
+        if (!isUserAlreadyLikeComment){
             const createdAt = new Date()
-            const addedLike = await usersRepository.addLike(userId, commentsId, createdAt, status)
+            const addedLike = await usersRepository.createLikeObject(userId, commentsId, createdAt, status)
 
             return addedLike
         }

@@ -68,7 +68,7 @@ export const usersQueryRepo = {
         }
     },
 
-    async isCommentLikeExist(userId: string, commentsId: string): Promise<boolean> {
+    async isUserAlreadyLikeComment(userId: string, commentsId: string): Promise<boolean> {
         if(!ObjectId.isValid(userId)){
             return false
         }
