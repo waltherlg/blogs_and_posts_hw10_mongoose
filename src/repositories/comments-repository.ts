@@ -33,7 +33,7 @@ export const commentsRepository = {
     },
 
     async setCountCommentsLike(commentsId: string, status: string) {
-        if (ObjectId.isValid(commentsId)) {
+        if (!ObjectId.isValid(commentsId)) {
             return false
         }
         let _id = new ObjectId(commentsId)

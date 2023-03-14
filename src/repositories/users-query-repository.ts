@@ -3,6 +3,7 @@ import {usersRepository} from "./users-repository";
 import {PaginationOutputModel} from "../models/models";
 import {UserModel} from "../schemes/schemes";
 import {ObjectId} from "mongodb";
+import {tr} from "date-fns/locale";
 
 function sort(sortDirection: string) {
     return (sortDirection === 'desc') ? -1 : 1;
@@ -73,7 +74,7 @@ export const usersQueryRepo = {
             return false
         }
         let _id = new ObjectId(userId)
-        const isExist = UserModel.findOne({_id: _id, likedComments: {$elemMatch: {commentsId: commentsId}}})
+        const isExist = await UserModel.findOne({_id: _id, likedComments: {$elemMatch: {commentsId: commentsId}}})
         return !!isExist
     }
 

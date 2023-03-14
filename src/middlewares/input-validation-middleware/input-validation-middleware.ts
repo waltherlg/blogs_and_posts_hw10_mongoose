@@ -161,10 +161,11 @@ export const likeStatusValidation = body('likeStatus')
     .exists().bail().withMessage({message: "is not a string", field: "likeStatus" })
     .isString().bail().withMessage({"message": "like is not string", "field": "likeStatus" })
     .trim().bail().withMessage({message: "wrong blogId", field: "likeStatus" })
-    .custom(async value => {
-        if (value !== 'none' || 'like' || 'dislike'){
-            throw new Error
+    .custom(value => {
+        if (value !== 'none' && value !== 'like' && value !== 'dislike'){
+            throw new Error("like has wrong format");
         }
+        return true;
     }).withMessage({"message": "like has wrong format", "field": "likeStatus" })
 
 export const commentContentValidation = body('content')

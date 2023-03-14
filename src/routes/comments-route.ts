@@ -75,13 +75,21 @@ commentsRouter.put('/:commentsId/like-status',
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
     try {
+        const isCommentExist = await commentsQueryRepo.getCommentById(req.params.commentsId.toString())
+        if (!isCommentExist) {
+            res.sendStatus(404)
+        }
         const token = req.headers.authorization!.split(' ')[1]
         const userId = await jwtService.getUserIdFromRefreshToken(token)
         let updateCommentLike = await likeService.updateCommentLike(
             userId,
             req.params.commentsId.toString(),
             req.body.likeStatus)
-        res.sendStatus(201)
+        if (updateCommentLike){
+            res.sendStatus(201)
+        }
+        else res.status(400).send('not like')
+
 
         // if (updateCommentLike) {
         //     res.sendStatus(204)
