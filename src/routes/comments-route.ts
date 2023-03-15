@@ -89,14 +89,6 @@ commentsRouter.put('/:commentsId/like-status',
             res.sendStatus(201)
         }
         else res.status(400).send('not like')
-
-
-        // if (updateCommentLike) {
-        //     res.sendStatus(204)
-        // }
-        // else {
-        //     res.sendStatus(404)
-        // }
     }
     catch (error) {
         res.status(500).send(`controller comment like status error: ${(error as any).message}`)

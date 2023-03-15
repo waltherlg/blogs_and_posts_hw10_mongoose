@@ -83,6 +83,7 @@ export type CommentDBType = {
     createdAt:	string
     likesCount: number
     dislikesCount: number
+    myStatus: string
 
 }
 type CommentatorInfoType = {
@@ -92,7 +93,7 @@ type CommentatorInfoType = {
 type LikesInfoType = {
     likesCount: number,
     dislikesCount: number,
-    myStatus: any
+    myStatus: string
 }
 export type CommentTypeOutput = {
     id:	string

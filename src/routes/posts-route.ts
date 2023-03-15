@@ -100,7 +100,7 @@ postsRouter.post('/:postId/comments',
                 req.params.postId,
                 req.body.content,
                 req.userId)
-            const newComment = commentsQueryRepo.getCommentById(newCommentId)
+            const newComment = await commentsQueryRepo.getCommentById(newCommentId)
             res.status(201).send(newComment)
         } catch (error) {
             res.status(500).send(`controller create comment by post id error: ${(error as any).message}`)

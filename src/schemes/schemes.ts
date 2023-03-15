@@ -2,7 +2,16 @@ import mongoose from "mongoose";
 import {ObjectId} from "mongodb";
 import {BlogDBType, CommentDBType, PostDBType, UserDeviceDBType, UserDBType} from "../models/types";
 
-
+const likedCommentsSchema = new mongoose.Schema({
+    commentsId: String,
+    createdAt: String,
+    status: String
+})
+const likedPostsSchema = new mongoose.Schema({
+    postId: String,
+    createdAt: String,
+    status: String
+})
 export const userSchema = new mongoose.Schema<UserDBType>({
     login: String,
     passwordHash: String,
@@ -26,10 +35,10 @@ export const userSchema = new mongoose.Schema<UserDBType>({
         type: Date,
         default: null
     },
-    likedComments: [],
-    likedPosts: []
-
+    likedComments: [likedCommentsSchema],
+    likedPosts: [likedPostsSchema]
 })
+
 export const UserModel = mongoose.model('users', userSchema)
 
 export const blogSchema = new mongoose.Schema<BlogDBType>({
@@ -62,7 +71,8 @@ export const commentSchema = new mongoose.Schema<CommentDBType>({
     userLogin:	String,
     createdAt:	String,
     likesCount: Number,
-    dislikesCount: Number
+    dislikesCount: Number,
+    myStatus: String
 })
 export const CommentModel = mongoose.model('comments', commentSchema)
 

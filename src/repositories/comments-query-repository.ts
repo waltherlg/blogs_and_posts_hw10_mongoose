@@ -14,9 +14,9 @@ export const commentsQueryRepo = {
         pageNumber: string,
         pageSize: string,) {
 
-        let commentsCount = await CommentModel.countDocuments({$and:[{parentType: "post"},{parentId: postId}]})
+        let commentsCount = await CommentModel.countDocuments({$and: [{parentType: "post"}, {parentId: postId}]})
 
-        let comments = await CommentModel.find({$and:[{parentType: "post"},{parentId: postId}]})
+        let comments = await CommentModel.find({$and: [{parentType: "post"}, {parentId: postId}]})
             .sort({[sortBy]: sort(sortDirection)})
             .skip(skipped(pageNumber, pageSize))
             .limit(+pageSize)
@@ -26,14 +26,20 @@ export const commentsQueryRepo = {
             return {
                 id: comments._id.toString(),
                 content: comments.content,
-                userId: comments.userId,
-                userLogin: comments.userLogin,
-                createdAt: comments.createdAt
+                commentatorInfo: {
+                    userId: comments.userId,
+                    userLogin: comments.userLogin,
+                },
+                createdAt: comments.createdAt,
+                LikesInfo: {
+                    likesCount: comments.likesCount,
+                    dislikesCount: comments.dislikesCount,
+                    myStatus: 'None'
+                }
             }
-
         })
 
-        let pageCount =  Math.ceil(commentsCount / +pageSize)
+        let pageCount = Math.ceil(commentsCount / +pageSize)
 
         let outputComments = {
             pagesCount: pageCount,
@@ -46,7 +52,7 @@ export const commentsQueryRepo = {
     },
 
     async getCommentById(id: string): Promise<CommentTypeOutput | null> {
-        if(!ObjectId.isValid(id)){
+        if (!ObjectId.isValid(id)) {
             return null
         }
         let _id = new ObjectId(id)
@@ -63,9 +69,9 @@ export const commentsQueryRepo = {
             },
             createdAt: comment.createdAt,
             LikesInfo: {
-                likesCount: 0,
-                dislikesCount: 0,
-                myStatus: 0
+                likesCount: comment.likesCount,
+                dislikesCount: comment.dislikesCount,
+                myStatus: 'None'
             }
         }
     },

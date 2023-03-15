@@ -162,8 +162,8 @@ export const likeStatusValidation = body('likeStatus')
     .isString().bail().withMessage({"message": "like is not string", "field": "likeStatus" })
     .trim().bail().withMessage({message: "wrong blogId", field: "likeStatus" })
     .custom(value => {
-        if (value !== 'none' && value !== 'like' && value !== 'dislike'){
-            throw new Error("like has wrong format");
+        if (value !== 'None' && value !== 'Like' && value !== 'Dislike'){
+            throw new Error
         }
         return true;
     }).withMessage({"message": "like has wrong format", "field": "likeStatus" })

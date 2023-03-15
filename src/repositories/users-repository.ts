@@ -98,7 +98,7 @@ export const usersRepository = {
         return result.modifiedCount === 1
     },
 
-    async createLikeObject(userId: string, commentsId: string, createdAt: Date, status: string){
+    async createCommentsLikeObject(userId: string, commentsId: string, createdAt: Date, status: string){
         if (!ObjectId.isValid(userId)){
             return false
         }
@@ -109,7 +109,19 @@ export const usersRepository = {
         user.likedComments.push(newLikedComment)
         await user.save();
         return true
-    }
+    },
+
+    async updateCommentsLikeObject(userId: string, commentsId: string, status: string){
+        if (!ObjectId.isValid(userId)){
+            return false
+        }
+        let _id = new ObjectId(userId)
+        let updateStatus = await UserModel.findOneAndUpdate(
+            { _id: _id, 'likedComments.commentsId': commentsId },
+            { $set: { 'likedComments.$.status': status } },
+        )
+        return true
+    },
 
 
 }

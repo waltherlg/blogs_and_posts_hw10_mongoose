@@ -20,7 +20,8 @@ export const commentService = {
             "userLogin": user!.login,
             "createdAt": new Date().toISOString(),
             "likesCount": 0,
-            'dislikesCount': 0
+            'dislikesCount': 0,
+            "myStatus": 'None'
         }
         const createdCommentId = await commentsRepository.createComment(newComment)
         return createdCommentId
