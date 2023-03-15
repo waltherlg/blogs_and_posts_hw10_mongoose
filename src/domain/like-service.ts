@@ -12,8 +12,10 @@ export const likeService = {
             const setCount = await commentsRepository.setCountCommentsLike(commentsId, status)
             return addedLike
         }
-        else return false
-
+        const likedComments = await usersQueryRepo.getUsersLikedComments(userId)
+        if (!likedComments) return false
+        const comment = likedComments.find(c => c.commentsId === commentsId)
+        const CurrentStatus = comment ? comment.status : null
 
     }
 }

@@ -76,6 +76,17 @@ export const usersQueryRepo = {
         let _id = new ObjectId(userId)
         const isExist = await UserModel.findOne({_id: _id, likedComments: {$elemMatch: {commentsId: commentsId}}})
         return !!isExist
+    },
+
+    async getUsersLikedComments(userId: string){
+        if(!ObjectId.isValid(userId)){
+            return null
+        }
+        let _id = new ObjectId(userId)
+        const user = await UserModel.findOne({_id: _id})
+        if (!user) return null
+        return user.likedComments
     }
+
 
 }
