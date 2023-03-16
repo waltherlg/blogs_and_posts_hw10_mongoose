@@ -18,7 +18,7 @@ export const app = express()
 app.set('trust proxy', true)
 const port = process.env.PORT || 3000
 
-
+//пора делать классы
 app.use(bodyParser.json());
 app.use(cookieParser())
 
